@@ -250,7 +250,7 @@ See the commit history for all details.
 
 2026 08 17 - mprough
 - add admin-selectable product-price tax modes: Never, Always, or logged-in Georgia customers only
-- verify conditional Georgia tax using the logged-in customer\'s Zen Cart country and zone records
+- verify conditional Georgia tax using the logged-in customer's Zen Cart country and zone records
 
 2026 08 17 - mprough
 - format Schema offer `price`, `lowPrice`, and `highPrice` values to exactly two decimal places
