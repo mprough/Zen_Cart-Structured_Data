@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'StructuredData';
 
-    public string $version = '2.1.6';
+    public string $version = '2.1.7';
 
 
 
@@ -176,14 +176,17 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Product Price Tax Mode', 'PLUGIN_SDATA_PRICE_TAX_MODE', 'LoggedInTaxZone', 'Control when tax is included in structured-data and Open Graph product prices. LoggedInTaxZone includes tax only for a logged-in customer when Zen Cart returns an applicable configured tax rate.', $this->cgi, 139, 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInTaxZone\'),')"
         );
 
-        // Rename the state-specific v2.1.5 value to the generic Zen Cart tax-zone mode.
+        // Always refresh the description and dropdown. Preserve Never/Always,
+        // but migrate the obsolete v2.1.5 LoggedInGeorgia value.
         $this->executeInstallerSql(
             "UPDATE " . TABLE_CONFIGURATION . "
-                SET configuration_value = 'LoggedInTaxZone',
+                SET configuration_value = CASE
+                        WHEN configuration_value = 'LoggedInGeorgia' THEN 'LoggedInTaxZone'
+                        ELSE configuration_value
+                    END,
                     configuration_description = 'Control when tax is included in structured-data and Open Graph product prices. LoggedInTaxZone includes tax only for a logged-in customer when Zen Cart returns an applicable configured tax rate.',
                     set_function = 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInTaxZone\'),'
-              WHERE configuration_key = 'PLUGIN_SDATA_PRICE_TAX_MODE'
-                AND configuration_value = 'LoggedInGeorgia'"
+              WHERE configuration_key = 'PLUGIN_SDATA_PRICE_TAX_MODE'"
         );
 
         // Add shipping-details settings when upgrading from an earlier version.
