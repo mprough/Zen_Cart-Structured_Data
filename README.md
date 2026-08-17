@@ -1,4 +1,4 @@
-# Structured Data for Zen Cart v2.1.2
+# Structured Data for Zen Cart v2.1.3
 Tested on Zen Cart 2.2.0+ on php 8+
 
 Encapsulated Plugin that adds Schema (in JSON-LD format), Facebook and Twitter structured markup to all pages.
@@ -247,6 +247,10 @@ maximum size: approx. 1MB.
 
 ## Changelog
 See the commit history for all details.
+
+2026 08 17 - mprough
+- fix storefront fatal error by removing unavailable Plugin Manager repository-class dependencies from the observer
+- resolve the installed plugin catalog directory directly from the observer path
 
 2026 08 17 - mprough
 - add optional `validFrom` to product offers

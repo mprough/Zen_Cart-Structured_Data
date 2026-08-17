@@ -6,12 +6,8 @@ declare(strict_types=1);
  * @author: torvista
  * @link: https://github.com/torvista/Zen_Cart-Structured_Data
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version auto.structured_data.php torvista 27 Feb 2026
+ * @version auto.structured_data.php 17 Aug 2026
  */
-use Zencart\DbRepositories\PluginControlRepository;
-use Zencart\DbRepositories\PluginControlVersionRepository;
-use Zencart\PluginManager\PluginManager;
-
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
@@ -31,14 +27,11 @@ class zcObserverStructuredData extends base
             return;
         }
 
-        // Determine this zc_plugin's installed directory
-        global $db;
-        $plugin_manager = new PluginManager(new PluginControlRepository($db), new PluginControlVersionRepository($db));
-        $this->zcPluginDir = str_replace(
-            DIR_FS_CATALOG,
-            '',
-            $plugin_manager->getPluginVersionDirectory('StructuredData', $plugin_manager->getInstalledPlugins()) . 'catalog/'
-        );
+        // This observer is in catalog/includes/classes/observers.
+        // Resolve the plugin's catalog directory directly without relying on
+        // Plugin Manager repository classes that are unavailable in some
+        // supported Zen Cart versions.
+        $this->zcPluginDir = dirname(__DIR__, 3) . '/';
 
         // Observers
         $this->attach(

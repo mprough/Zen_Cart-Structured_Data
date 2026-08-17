@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'StructuredData';
 
-    public string $version = '2.1.2';
+    public string $version = '2.1.3';
 
 
 
