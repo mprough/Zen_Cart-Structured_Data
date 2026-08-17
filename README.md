@@ -1,4 +1,4 @@
-# Structured Data for Zen Cart v2.1.5
+# Structured Data for Zen Cart v2.1.6
 Tested on Zen Cart 2.2.0+ on php 8+
 
 Encapsulated Plugin that adds Schema (in JSON-LD format), Facebook and Twitter structured markup to all pages.
@@ -247,6 +247,11 @@ maximum size: approx. 1MB.
 
 ## Changelog
 See the commit history for all details.
+
+2026 08 17 - mprough
+- remove the state-specific Georgia tax condition
+- use Zen Cart's configured tax-zone calculation for any logged-in customer location
+- rename the conditional mode to `LoggedInTaxZone` and migrate the prior setting automatically
 
 2026 08 17 - mprough
 - add admin-selectable product-price tax modes: Never, Always, or logged-in Georgia customers only

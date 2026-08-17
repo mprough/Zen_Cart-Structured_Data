@@ -279,32 +279,19 @@ switch ($page_type) {
             $taxMode = defined('PLUGIN_SDATA_PRICE_TAX_MODE')
                 ? PLUGIN_SDATA_PRICE_TAX_MODE
                 : 'Always';
-            $includeTax = ($taxMode === 'Always');
-
-            if (
-                $taxMode === 'LoggedInGeorgia'
-                && !empty($_SESSION['customer_id'])
-                && !empty($_SESSION['customer_zone_id'])
-            ) {
-                $customerZone = $db->Execute(
-                    "SELECT z.zone_code, c.countries_iso_code_2
-                       FROM " . TABLE_ZONES . " z
-                       INNER JOIN " . TABLE_COUNTRIES . " c
-                               ON c.countries_id = z.zone_country_id
-                      WHERE z.zone_id = " . (int)$_SESSION['customer_zone_id'] . "
-                      LIMIT 1"
-                );
-
-                $includeTax = (
-                    !$customerZone->EOF
-                    && strtoupper((string)$customerZone->fields['zone_code']) === 'GA'
-                    && strtoupper((string)$customerZone->fields['countries_iso_code_2']) === 'US'
-                );
-            }
+            $taxRate = (float)zen_get_tax_rate($tax_class_id);
+            $includeTax = (
+                $taxMode === 'Always'
+                || (
+                    $taxMode === 'LoggedInTaxZone'
+                    && !empty($_SESSION['customer_id'])
+                    && $taxRate > 0
+                )
+            );
 
             $product_base_displayed_price = (float)zen_get_products_actual_price($product_id);
             if ($includeTax) {
-                $product_base_displayed_price *= (1 + zen_get_tax_rate($tax_class_id) / 100);
+                $product_base_displayed_price *= (1 + $taxRate / 100);
             }
             $product_base_displayed_price = round($product_base_displayed_price, 2);
         }

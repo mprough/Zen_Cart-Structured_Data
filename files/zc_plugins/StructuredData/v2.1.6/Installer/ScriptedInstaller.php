@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'StructuredData';
 
-    public string $version = '2.1.5';
+    public string $version = '2.1.6';
 
 
 
@@ -105,7 +105,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Product Delivery Time when out of stock (Schema)', 'PLUGIN_SDATA_DELIVERYLEADTIME_OOS', '', 'Enter the average days from order to delivery when product is out of stock (e.g.:7).', $this->cgi, 130, null),
 
                 ('Product Condition (Schema/OG)', 'PLUGIN_SDATA_FOG_PRODUCT_CONDITION', 'new', 'Choose your product\'s condition.', $this->cgi, 135, 'zen_cfg_select_option(array(\'new\', \'used\', \'refurbished\'),'),
-                ('Product Price Tax Mode', 'PLUGIN_SDATA_PRICE_TAX_MODE', 'LoggedInGeorgia', 'Control when tax is included in structured-data and Open Graph product prices. LoggedInGeorgia includes tax only for a logged-in customer whose Zen Cart country and zone are US/GA.', $this->cgi, 139, 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInGeorgia\'),'),
+                ('Product Price Tax Mode', 'PLUGIN_SDATA_PRICE_TAX_MODE', 'LoggedInTaxZone', 'Control when tax is included in structured-data and Open Graph product prices. LoggedInTaxZone includes tax only for a logged-in customer when Zen Cart returns an applicable configured tax rate.', $this->cgi, 139, 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInTaxZone\'),'),
 
                 ('Default Product Weight', 'PLUGIN_SDATA_DEFAULT_WEIGHT', '0.5', 'If product has no weight defined, use this value.', $this->cgi, 140, null),
                 ('Enable Product Shipping Details', 'PLUGIN_SDATA_SHIPPING_DETAILS_ENABLE', 'false', 'Add shippingDetails with a fixed shipping rate to each product offer?', $this->cgi, 141, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
@@ -173,7 +173,17 @@ class ScriptedInstaller extends ScriptedInstallBase
             "INSERT IGNORE INTO " . TABLE_CONFIGURATION . "
                 (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function)
              VALUES
-                ('Product Price Tax Mode', 'PLUGIN_SDATA_PRICE_TAX_MODE', 'LoggedInGeorgia', 'Control when tax is included in structured-data and Open Graph product prices. LoggedInGeorgia includes tax only for a logged-in customer whose Zen Cart country and zone are US/GA.', $this->cgi, 139, 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInGeorgia\'),')"
+                ('Product Price Tax Mode', 'PLUGIN_SDATA_PRICE_TAX_MODE', 'LoggedInTaxZone', 'Control when tax is included in structured-data and Open Graph product prices. LoggedInTaxZone includes tax only for a logged-in customer when Zen Cart returns an applicable configured tax rate.', $this->cgi, 139, 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInTaxZone\'),')"
+        );
+
+        // Rename the state-specific v2.1.5 value to the generic Zen Cart tax-zone mode.
+        $this->executeInstallerSql(
+            "UPDATE " . TABLE_CONFIGURATION . "
+                SET configuration_value = 'LoggedInTaxZone',
+                    configuration_description = 'Control when tax is included in structured-data and Open Graph product prices. LoggedInTaxZone includes tax only for a logged-in customer when Zen Cart returns an applicable configured tax rate.',
+                    set_function = 'zen_cfg_select_option(array(\'Never\', \'Always\', \'LoggedInTaxZone\'),'
+              WHERE configuration_key = 'PLUGIN_SDATA_PRICE_TAX_MODE'
+                AND configuration_value = 'LoggedInGeorgia'"
         );
 
         // Add shipping-details settings when upgrading from an earlier version.
