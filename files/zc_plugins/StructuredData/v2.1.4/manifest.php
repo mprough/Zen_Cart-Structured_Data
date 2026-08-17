@@ -6,10 +6,10 @@ declare(strict_types=1);
  * @author: torvista
  * @link: https://github.com/torvista/Zen_Cart-Structured_Data
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version 2.1.3 17 Aug 2026
+ * @version 2.1.4 17 Aug 2026
  */
 return [
-    'pluginVersion' => 'v2.1.3',
+    'pluginVersion' => 'v2.1.4',
     'pluginName' => 'Structured Data',
     'pluginDescription' => 'This plugin adds Schema, Facebook and Twitter markup into the head of all site pages.',
     'pluginAuthor' => 'torvista, Zen4All, mprough, ZenExpert',

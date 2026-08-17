@@ -1235,7 +1235,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
                         $offer = [
                             '@type' => 'Offer',
-                            'price' => number_format((float)$product_attribute['price'], $decimal_places, '.', ''),
+                            'price' => number_format((float)$product_attribute['price'], 2, '.', ''),
                             'weight' => [
                                 '@type' => 'QuantitativeValue',
                                 'value' => ($weight + $product_attribute['weight'] > 0
@@ -1317,11 +1317,11 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
                     if ($attribute_lowPrice === $attribute_highPrice) {
                         $offer['@type'] = 'Offer';
-                        $offer['price'] = $attribute_lowPrice;
+                        $offer['price'] = number_format((float)$attribute_lowPrice, 2, '.', '');
                     } else {
                         $offer['@type']    = 'AggregateOffer';
-                        $offer['lowPrice'] = $attribute_lowPrice;
-                        $offer['highPrice'] = $attribute_highPrice;
+                        $offer['lowPrice'] = number_format((float)$attribute_lowPrice, 2, '.', '');
+                        $offer['highPrice'] = number_format((float)$attribute_highPrice, 2, '.', '');
                         $offer['offerCount'] = $offerCount;
                     }
 
@@ -1354,7 +1354,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             // Simple product (no attributes)
             $offer = [
                 '@type' => 'Offer',
-                'price' => $product_base_displayed_price,
+                'price' => number_format((float)$product_base_displayed_price, 2, '.', ''),
                 'url' => htmlspecialchars_decode($canonicalLink),
                 'priceCurrency' => PLUGIN_SDATA_PRICE_CURRENCY,
                 'priceValidUntil'=> date('Y') . '-12-31',
@@ -1591,7 +1591,7 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
 <?php
         }
 ?>
-    <meta property="product:price:amount" content="<?= $product_base_displayed_price ?>">
+    <meta property="product:price:amount" content="<?= number_format((float)$product_base_displayed_price, 2, '.', '') ?>">
     <meta property="product:price:currency" content="<?= htmlentities(PLUGIN_SDATA_PRICE_CURRENCY, ENT_QUOTES, CHARSET, false) ?>">
     <meta property="product:product_link" content="<?= $canonicalLink ?>">
     <meta property="product:retailer" content="<?= !empty(PLUGIN_SDATA_FOG_APPID) ? htmlentities(PLUGIN_SDATA_FOG_APPID, ENT_QUOTES, CHARSET, false) : HTTP_SERVER . DIR_WS_CATALOG ?>">
