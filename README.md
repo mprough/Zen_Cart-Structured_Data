@@ -250,7 +250,7 @@ See the commit history for all details.
 
 2026 08 17 - mprough
 - remove the state-specific Georgia tax condition
-- use Zen Cart\'s configured tax-zone calculation for any logged-in customer location
+- use Zen Cart's configured tax-zone calculation for any logged-in customer location
 - rename the conditional mode to `LoggedInTaxZone` and migrate the prior setting automatically
 
 2026 08 17 - mprough
