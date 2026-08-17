@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'StructuredData';
 
-    public string $version = '2.1.1';
+    public string $version = '2.1.2';
 
 
 
@@ -109,6 +109,8 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Default Product Weight', 'PLUGIN_SDATA_DEFAULT_WEIGHT', '0.5', 'If product has no weight defined, use this value.', $this->cgi, 140, null),
                 ('Enable Product Shipping Details', 'PLUGIN_SDATA_SHIPPING_DETAILS_ENABLE', 'false', 'Add shippingDetails with a fixed shipping rate to each product offer?', $this->cgi, 141, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
                 ('Product Shipping Rate', 'PLUGIN_SDATA_SHIPPING_RATE', '5.00', 'Fixed shipping charge used in product shippingDetails. Enter a numeric amount without a currency symbol. The store default currency is used.', $this->cgi, 142, null),
+                ('Enable Offer Valid From', 'PLUGIN_SDATA_VALID_FROM_ENABLE', 'false', 'Add validFrom to each product offer?', $this->cgi, 143, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
+                ('Offer Valid From Date', 'PLUGIN_SDATA_VALID_FROM_DATE', '', 'Optional custom validFrom date in YYYY-MM-DD format. Leave blank to use today\'s date.', $this->cgi, 144, null),
 
                 ('Out of Stock Status', 'PLUGIN_SDATA_OOS_DEFAULT', 'BackOrder', 'The default OOS status if a product is out of stock and has no custom field defined for OOS status.', $this->cgi, 145, 'zen_cfg_select_option(array(\'BackOrder\', \'Discontinued\', \'OutOfStock\', \'PreOrder\', \'PreSale\', \'SoldOut\'),'),
                 ('Out of Stock - BackOrder/PreOrder Date', 'PLUGIN_SDATA_OOS_AVAILABILITY_DELAY', '10', 'The OOS BackOrder/PreSales conditions require an availability date.<br>Set the number of days to add to today\'s date, to create a new date.', $this->cgi, 150, null),
@@ -172,6 +174,15 @@ class ScriptedInstaller extends ScriptedInstallBase
              VALUES
                 ('Enable Product Shipping Details', 'PLUGIN_SDATA_SHIPPING_DETAILS_ENABLE', 'false', 'Add shippingDetails with a fixed shipping rate to each product offer?', $this->cgi, 141, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
                 ('Product Shipping Rate', 'PLUGIN_SDATA_SHIPPING_RATE', '5.00', 'Fixed shipping charge used in product shippingDetails. Enter a numeric amount without a currency symbol. The store default currency is used.', $this->cgi, 142, null)"
+        );
+
+        // Add validFrom settings when upgrading from an earlier version.
+        $this->executeInstallerSql(
+            "INSERT IGNORE INTO " . TABLE_CONFIGURATION . "
+                (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function)
+             VALUES
+                ('Enable Offer Valid From', 'PLUGIN_SDATA_VALID_FROM_ENABLE', 'false', 'Add validFrom to each product offer?', $this->cgi, 143, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
+                ('Offer Valid From Date', 'PLUGIN_SDATA_VALID_FROM_DATE', '', 'Optional custom validFrom date in YYYY-MM-DD format. Leave blank to use today\'s date.', $this->cgi, 144, null)"
         );
 
         switch ($oldVersion) {

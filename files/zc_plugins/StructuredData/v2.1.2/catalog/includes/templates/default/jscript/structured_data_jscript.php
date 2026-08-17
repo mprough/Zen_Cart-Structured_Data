@@ -1185,6 +1185,33 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             ];
         }
 
+        $validFrom = null;
+        if (
+            defined('PLUGIN_SDATA_VALID_FROM_ENABLE')
+            && PLUGIN_SDATA_VALID_FROM_ENABLE === 'true'
+        ) {
+            $validFrom = date('Y-m-d');
+            $customValidFrom = defined('PLUGIN_SDATA_VALID_FROM_DATE')
+                ? trim(PLUGIN_SDATA_VALID_FROM_DATE)
+                : '';
+
+            if ($customValidFrom !== '') {
+                $validFromDate = DateTimeImmutable::createFromFormat('!Y-m-d', $customValidFrom);
+                $validFromErrors = DateTimeImmutable::getLastErrors();
+
+                if (
+                    $validFromDate !== false
+                    && ($validFromErrors === false || (
+                        $validFromErrors['warning_count'] === 0
+                        && $validFromErrors['error_count'] === 0
+                    ))
+                    && $validFromDate->format('Y-m-d') === $customValidFrom
+                ) {
+                    $validFrom = $customValidFrom;
+                }
+            }
+        }
+
         /*
          * OFFERS
          * Three modes:
@@ -1235,6 +1262,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                             $offer['shippingDetails'] = $shippingDetails;
                         }
 
+                        if ($validFrom !== null) {
+                            $offer['validFrom'] = $validFrom;
+                        }
+
                         if (!empty($product_attribute['sku'])) {
                             $offer['sku'] = $product_attribute['sku'];
                         }
@@ -1278,6 +1309,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
                     if ($shippingDetails !== null) {
                         $offer['shippingDetails'] = $shippingDetails;
+                    }
+
+                    if ($validFrom !== null) {
+                        $offer['validFrom'] = $validFrom;
                     }
 
                     if ($attribute_lowPrice === $attribute_highPrice) {
@@ -1338,6 +1373,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
             if ($shippingDetails !== null) {
                 $offer['shippingDetails'] = $shippingDetails;
+            }
+
+            if ($validFrom !== null) {
+                $offer['validFrom'] = $validFrom;
             }
 
             if ($backPreOrderDate !== '') {
