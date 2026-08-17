@@ -1163,6 +1163,28 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             $productSchema['google_product_category'] = (string)$product_base_gpc;
         }
 
+        $shippingDetails = null;
+        if (
+            defined('PLUGIN_SDATA_SHIPPING_DETAILS_ENABLE')
+            && PLUGIN_SDATA_SHIPPING_DETAILS_ENABLE === 'true'
+        ) {
+            $shippingRate = (
+                defined('PLUGIN_SDATA_SHIPPING_RATE')
+                && is_numeric(PLUGIN_SDATA_SHIPPING_RATE)
+            )
+                ? max(0, (float)PLUGIN_SDATA_SHIPPING_RATE)
+                : 0.0;
+
+            $shippingDetails = [
+                '@type' => 'OfferShippingDetails',
+                'shippingRate' => [
+                    '@type' => 'MonetaryAmount',
+                    'value' => number_format($shippingRate, 2, '.', ''),
+                    'currency' => DEFAULT_CURRENCY,
+                ],
+            ];
+        }
+
         /*
          * OFFERS
          * Three modes:
@@ -1209,6 +1231,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                             $offer = array_merge($offer, $hasMerchantReturnPolicy);
                         }
 
+                        if ($shippingDetails !== null) {
+                            $offer['shippingDetails'] = $shippingDetails;
+                        }
+
                         if (!empty($product_attribute['sku'])) {
                             $offer['sku'] = $product_attribute['sku'];
                         }
@@ -1248,6 +1274,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                     // Optional: merchant return policy
                     if (!empty($hasMerchantReturnPolicy)) {
                         $offer = array_merge($offer, $hasMerchantReturnPolicy);
+                    }
+
+                    if ($shippingDetails !== null) {
+                        $offer['shippingDetails'] = $shippingDetails;
                     }
 
                     if ($attribute_lowPrice === $attribute_highPrice) {
@@ -1304,6 +1334,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             // Optional: merchant return policy
             if (!empty($hasMerchantReturnPolicy)) {
                 $offer = array_merge($offer, $hasMerchantReturnPolicy);
+            }
+
+            if ($shippingDetails !== null) {
+                $offer['shippingDetails'] = $shippingDetails;
             }
 
             if ($backPreOrderDate !== '') {
