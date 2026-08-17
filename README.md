@@ -250,7 +250,7 @@ See the commit history for all details.
 
 2026 08 17 - mprough
 - add optional `validFrom` to product offers
-- add admin on/off control and optional custom date; blank uses today\'s date
+- add admin on/off control and optional custom date; blank uses today's date
 
 2026 08 17 - mprough
 - add optional `shippingDetails` to product offers
