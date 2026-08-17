@@ -276,11 +276,37 @@ switch ($page_type) {
         if ($product_info->fields['product_is_call'] === '1') {
             $product_base_displayed_price = 0;
         } else {
-            // Use price with tax, decimal point (not comma) to two decimal places
-            $product_base_displayed_price = round(
-                zen_get_products_actual_price($product_id) * (1 + zen_get_tax_rate($tax_class_id) / 100),
-                2
-            );
+            $taxMode = defined('PLUGIN_SDATA_PRICE_TAX_MODE')
+                ? PLUGIN_SDATA_PRICE_TAX_MODE
+                : 'Always';
+            $includeTax = ($taxMode === 'Always');
+
+            if (
+                $taxMode === 'LoggedInGeorgia'
+                && !empty($_SESSION['customer_id'])
+                && !empty($_SESSION['customer_zone_id'])
+            ) {
+                $customerZone = $db->Execute(
+                    "SELECT z.zone_code, c.countries_iso_code_2
+                       FROM " . TABLE_ZONES . " z
+                       INNER JOIN " . TABLE_COUNTRIES . " c
+                               ON c.countries_id = z.zone_country_id
+                      WHERE z.zone_id = " . (int)$_SESSION['customer_zone_id'] . "
+                      LIMIT 1"
+                );
+
+                $includeTax = (
+                    !$customerZone->EOF
+                    && strtoupper((string)$customerZone->fields['zone_code']) === 'GA'
+                    && strtoupper((string)$customerZone->fields['countries_iso_code_2']) === 'US'
+                );
+            }
+
+            $product_base_displayed_price = (float)zen_get_products_actual_price($product_id);
+            if ($includeTax) {
+                $product_base_displayed_price *= (1 + zen_get_tax_rate($tax_class_id) / 100);
+            }
+            $product_base_displayed_price = round($product_base_displayed_price, 2);
         }
         $product_date_added = $product_info->fields['products_date_added']; // Should never be default '0001-01-01 00:00:00'
         $manufacturer_name = zen_get_products_manufacturers_name($product_id);
