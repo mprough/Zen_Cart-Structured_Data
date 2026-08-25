@@ -1,4 +1,4 @@
-# SuperData 3.0.3 legacy installer for Zen Cart 1.5.6 and 1.5.7
+# SuperData 3.0.4 legacy installer for Zen Cart 1.5.6 and 1.5.7
 # Run with Admin > Tools > Install SQL Patches. Change table prefixes there if required.
 
 INSERT INTO configuration_group
@@ -76,8 +76,8 @@ INSERT IGNORE INTO configuration
                 ('Product Delivery Time when out of stock (Schema)', 'PLUGIN_SUPERDATA_DELIVERYLEADTIME_OOS', '', 'Enter the average days from order to delivery when product is out of stock (e.g.:7).', @superdata_group_id, 130, null),
 
                 ('Offer validFrom', 'PLUGIN_SUPERDATA_VALID_FROM_ENABLE', 'true', 'Add validFrom to every Offer. SuperData uses the future product available date when present, otherwise the product creation date.', @superdata_group_id, 131, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Enable shipping information in product Offer markup. The Shipping rate mode below determines whether SuperData outputs OfferShippingDetails or relies on Google Merchant Center.', @superdata_group_id, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Do not publish a possibly inaccurate product-page rate; use shipping rules configured in Google Merchant Center.<br><strong>Free:</strong> Publish a 0.00 shipping rate only when shipping is genuinely free.<br><strong>FlatRate:</strong> Publish the exact amount entered below for every covered product.', @superdata_group_id, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),'),
+                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Add OfferShippingDetails to every product Offer using the destination and delivery times below. Disable only when no product shipping information should be published.', @superdata_group_id, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
+                ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Publish shippingDetails with destination and delivery times, but omit the unknown rate and use Google Merchant Center for shipping prices.<br><strong>Free:</strong> Also publish a 0.00 rate only when shipping is genuinely free.<br><strong>FlatRate:</strong> Also publish the exact configured charge for every covered product.', @superdata_group_id, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),'),
                 ('Shipping destination country', 'PLUGIN_SUPERDATA_SHIPPING_COUNTRY', 'US', 'Two-letter ISO 3166-1 destination country, for example US, CA, or GB. Used only with Free or FlatRate mode.', @superdata_group_id, 134, null),
                 ('Shipping flat rate', 'PLUGIN_SUPERDATA_SHIPPING_RATE', '', 'Used only with FlatRate mode. Enter the exact shipping charge applied to every product covered by this rule, for example 5.95. Do not enter an average or estimate.', @superdata_group_id, 135, null),
                 ('Shipping handling time minimum', 'PLUGIN_SUPERDATA_HANDLING_MIN_DAYS', '0', 'Minimum business days before an order ships.', @superdata_group_id, 135, null),

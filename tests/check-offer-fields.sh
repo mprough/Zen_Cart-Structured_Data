@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-modern='files/zc_plugins/SuperData/v3.0.3/catalog/includes/templates/default/jscript/super_data_jscript.php'
+modern='files/zc_plugins/SuperData/v3.0.4/catalog/includes/templates/default/jscript/super_data_jscript.php'
 legacy='files/legacy/includes/templates/YOUR_TEMPLATE/jscript/jscript_super_data.php'
 
 for file in "$modern" "$legacy"; do

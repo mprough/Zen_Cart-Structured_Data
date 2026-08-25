@@ -13,7 +13,7 @@ This is the successor to Structured Data for Zen Cart. Version 3 is renamed, reo
 
 Always test on a development store and back up the files and database before installation.
 
-## Google fields fixed in SuperData 3.0.3
+## Google fields fixed in SuperData 3.0.4
 
 Every generated Offer path now supports:
 
@@ -34,7 +34,7 @@ Return policies also include the configured `refundType`: full monetary refund, 
 
 Shipping details are configurable through an explicit rate mode:
 
-- `MerchantCenter`: Google Merchant Center shipping rules remain authoritative. SuperData does not publish a possibly false product-page rate.
+- `MerchantCenter`: SuperData publishes `shippingDetails` with the truthful destination and delivery times, omits the unknown rate, and leaves shipping prices to Google Merchant Center.
 - `Free`: SuperData publishes a `0.00` shipping rate. Use this only when shipping is genuinely free for the configured destination.
 - `FlatRate`: SuperData publishes the exact configured charge for every covered product. Do not enter an average or estimate.
 
@@ -44,7 +44,7 @@ The safe default is `MerchantCenter`. The initial destination is `US`, handling 
 
 1. Copy the contents of `files/zc_plugins` to the store's `zc_plugins` directory.
 2. In Admin, open Modules > Plugin Manager.
-3. Install SuperData 3.0.3.
+3. Install SuperData 3.0.4.
 4. Open Configuration > SuperData and review every store-specific setting.
 5. Validate at least one simple product, one product with attributes, and one out-of-stock product.
 
@@ -64,7 +64,7 @@ The legacy file avoids PHP 8-only functions and syntax. It uses traditional temp
 
 To uninstall the legacy edition, run `files/legacy/sql/uninstall.sql`, then remove the two copied PHP files.
 
-Existing legacy SuperData installations should copy the updated PHP files, run `files/legacy/sql/upgrade_to_3.0.2.sql` if that upgrade has not already been applied, and then run `files/legacy/sql/upgrade_to_3.0.3.sql`. The upgrades add missing settings and refresh their instructions without resetting existing configuration values.
+Existing legacy SuperData installations should copy the updated PHP files, then run each unapplied upgrade in order: `upgrade_to_3.0.2.sql`, `upgrade_to_3.0.3.sql`, and `upgrade_to_3.0.4.sql`. The upgrades add missing settings and refresh their instructions without resetting existing configuration values.
 
 ## Required configuration review
 

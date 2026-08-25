@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'SuperData';
 
-    public string $version = '3.0.3';
+    public string $version = '3.0.4';
 
 
 
@@ -105,8 +105,8 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Product Delivery Time when out of stock (Schema)', 'PLUGIN_SUPERDATA_DELIVERYLEADTIME_OOS', '', 'Enter the average days from order to delivery when product is out of stock (e.g.:7).', $this->cgi, 130, null),
 
                 ('Offer validFrom', 'PLUGIN_SUPERDATA_VALID_FROM_ENABLE', 'true', 'Add validFrom to every Offer. SuperData uses the future product available date when present, otherwise the product creation date.', $this->cgi, 131, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Enable shipping information in product Offer markup. The Shipping rate mode below determines whether SuperData outputs an OfferShippingDetails block or relies on Google Merchant Center.', $this->cgi, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Do not publish a possibly inaccurate product-page rate; use shipping rules configured in Google Merchant Center.<br><strong>Free:</strong> Publish a 0.00 shipping rate. Choose this only when shipping is genuinely free for the destination below.<br><strong>FlatRate:</strong> Publish the exact amount entered in Shipping flat rate for every product covered by this rule.', $this->cgi, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),'),
+                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Add OfferShippingDetails to every product Offer using the destination and delivery times below. Disable only when no product shipping information should be published.', $this->cgi, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
+                ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Publish shippingDetails with destination and delivery times, but omit the unknown rate and use Google Merchant Center for shipping prices.<br><strong>Free:</strong> Also publish a 0.00 rate. Choose only when shipping is genuinely free.<br><strong>FlatRate:</strong> Also publish the exact configured charge for every covered product.', $this->cgi, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),'),
                 ('Shipping destination country', 'PLUGIN_SUPERDATA_SHIPPING_COUNTRY', 'US', 'Two-letter ISO 3166-1 destination country, for example US, CA, or GB. Used only with Free or FlatRate mode.', $this->cgi, 134, null),
                 ('Shipping flat rate', 'PLUGIN_SUPERDATA_SHIPPING_RATE', '', 'Used only when Shipping rate mode is FlatRate. Enter the exact shipping charge applied to every product covered by this rule, for example 5.95. Do not enter an average or estimated amount. Leave blank for MerchantCenter or Free mode.', $this->cgi, 135, null),
                 ('Shipping handling time minimum', 'PLUGIN_SUPERDATA_HANDLING_MIN_DAYS', '0', 'Minimum business days before an order ships.', $this->cgi, 135, null),
@@ -275,6 +275,8 @@ class ScriptedInstaller extends ScriptedInstallBase
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = '<strong>Required to publish hasMerchantReturnPolicy.</strong> Enter the two-letter ISO country code where this policy applies, for example US. Separate multiple countries with commas.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY'");
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Returns - Return Destination Country', configuration_description = 'Optional two-letter ISO country code where returned products must be sent. This no longer controls whether the return policy is published.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY'");
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Organization Type' WHERE configuration_key = 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE'");
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = 'Add OfferShippingDetails to every product Offer using the configured destination and delivery times. Disable only when no product shipping information should be published.' WHERE configuration_key = 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE'");
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = '<strong>MerchantCenter:</strong> Publish shippingDetails with destination and delivery times, but omit the unknown rate and use Google Merchant Center for shipping prices.<br><strong>Free:</strong> Also publish a 0.00 rate only when shipping is genuinely free.<br><strong>FlatRate:</strong> Also publish the exact configured charge for every covered product.' WHERE configuration_key = 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE'");
         return true;
     }
 
