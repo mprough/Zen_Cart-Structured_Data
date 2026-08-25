@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'SuperData';
 
-    public string $version = '3.0.0';
+    public string $version = '3.0.1';
 
 
 
@@ -105,9 +105,10 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Product Delivery Time when out of stock (Schema)', 'PLUGIN_SUPERDATA_DELIVERYLEADTIME_OOS', '', 'Enter the average days from order to delivery when product is out of stock (e.g.:7).', $this->cgi, 130, null),
 
                 ('Offer validFrom', 'PLUGIN_SUPERDATA_VALID_FROM_ENABLE', 'true', 'Add validFrom to every Offer. SuperData uses the future product available date when present, otherwise the product creation date.', $this->cgi, 131, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Add Google-supported OfferShippingDetails to every Offer.', $this->cgi, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
-                ('Shipping destination country', 'PLUGIN_SUPERDATA_SHIPPING_COUNTRY', 'US', 'Two-letter ISO 3166-1 country code for the shipping destination, for example US, CA, or GB.', $this->cgi, 133, null),
-                ('Shipping rate', 'PLUGIN_SUPERDATA_SHIPPING_RATE', '0.00', 'Representative shipping rate used in structured data. Enter a decimal amount. Use 0.00 only when the represented shipping is free.', $this->cgi, 134, null),
+                ('Offer shippingDetails', 'PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE', 'true', 'Enable shipping information in product Offer markup. The Shipping rate mode below determines whether SuperData outputs an OfferShippingDetails block or relies on Google Merchant Center.', $this->cgi, 132, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
+                ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Do not publish a possibly inaccurate product-page rate; use shipping rules configured in Google Merchant Center.<br><strong>Free:</strong> Publish a 0.00 shipping rate. Choose this only when shipping is genuinely free for the destination below.<br><strong>FlatRate:</strong> Publish the exact amount entered in Shipping flat rate for every product covered by this rule.', $this->cgi, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),'),
+                ('Shipping destination country', 'PLUGIN_SUPERDATA_SHIPPING_COUNTRY', 'US', 'Two-letter ISO 3166-1 destination country, for example US, CA, or GB. Used only with Free or FlatRate mode.', $this->cgi, 134, null),
+                ('Shipping flat rate', 'PLUGIN_SUPERDATA_SHIPPING_RATE', '', 'Used only when Shipping rate mode is FlatRate. Enter the exact shipping charge applied to every product covered by this rule, for example 5.95. Do not enter an average or estimated amount. Leave blank for MerchantCenter or Free mode.', $this->cgi, 135, null),
                 ('Shipping handling time minimum', 'PLUGIN_SUPERDATA_HANDLING_MIN_DAYS', '0', 'Minimum business days before an order ships.', $this->cgi, 135, null),
                 ('Shipping handling time maximum', 'PLUGIN_SUPERDATA_HANDLING_MAX_DAYS', '1', 'Maximum business days before an order ships.', $this->cgi, 136, null),
                 ('Shipping transit time minimum', 'PLUGIN_SUPERDATA_TRANSIT_MIN_DAYS', '2', 'Minimum business days in transit.', $this->cgi, 137, null),
@@ -181,6 +182,14 @@ class ScriptedInstaller extends ScriptedInstallBase
     {
         $this->cgi = $this->getOrCreateConfigGroupId($this->configGroupTitle, $this->configGroupTitle, null);
         switch ($oldVersion) {
+            case "v3.0.0":
+                $this->executeInstallerSql("INSERT IGNORE INTO " . TABLE_CONFIGURATION . "
+                    (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function)
+                    VALUES
+                    ('Shipping rate mode', 'PLUGIN_SUPERDATA_SHIPPING_RATE_MODE', 'MerchantCenter', '<strong>MerchantCenter:</strong> Do not publish a possibly inaccurate product-page rate; use shipping rules configured in Google Merchant Center.<br><strong>Free:</strong> Publish a 0.00 shipping rate only when shipping is genuinely free.<br><strong>FlatRate:</strong> Publish the exact configured flat rate.', $this->cgi, 133, 'zen_cfg_select_option(array(\'MerchantCenter\', \'Free\', \'FlatRate\'),')");
+                $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Shipping flat rate', configuration_value = '', configuration_description = 'Used only when Shipping rate mode is FlatRate. Enter the exact shipping charge applied to every covered product. Do not enter an average or estimated amount.', sort_order = 135 WHERE configuration_key = 'PLUGIN_SUPERDATA_SHIPPING_RATE'");
+                break;
+
             case "v2.0.0":
                 // Add new values
                 $this->executeInstallerSql("INSERT IGNORE INTO " . TABLE_CONFIGURATION . "

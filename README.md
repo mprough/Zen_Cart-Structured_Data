@@ -13,7 +13,7 @@ This is the successor to Structured Data for Zen Cart. Version 3 is renamed, reo
 
 Always test on a development store and back up the files and database before installation.
 
-## Google Offer fields fixed in SuperData 3
+## Google Offer fields fixed in SuperData 3.0.1
 
 Every generated Offer path now supports:
 
@@ -26,13 +26,19 @@ Every generated Offer path now supports:
 
 `validFrom` uses a future product availability date when one is set. Otherwise, it uses the product creation date. If neither contains a valid date, SuperData safely uses the current date.
 
-Shipping details are enabled by default and are configurable. The initial destination is `US`, the initial rate is `0.00`, handling is 0-1 days, and transit is 2-7 days. These are safe installation defaults, not a claim about the store's real shipping service. Review them immediately after installation. Never leave `0.00` if the represented shipping is not actually free.
+Shipping details are configurable through an explicit rate mode:
+
+- `MerchantCenter`: Google Merchant Center shipping rules remain authoritative. SuperData does not publish a possibly false product-page rate.
+- `Free`: SuperData publishes a `0.00` shipping rate. Use this only when shipping is genuinely free for the configured destination.
+- `FlatRate`: SuperData publishes the exact configured charge for every covered product. Do not enter an average or estimate.
+
+The safe default is `MerchantCenter`. The initial destination is `US`, handling is 0-1 days, and transit is 2-7 days. Review these values immediately after installation.
 
 ## Installation: Zen Cart 2.x
 
 1. Copy the contents of `files/zc_plugins` to the store's `zc_plugins` directory.
 2. In Admin, open Modules > Plugin Manager.
-3. Install SuperData 3.0.0.
+3. Install SuperData 3.0.1.
 4. Open Configuration > SuperData and review every store-specific setting.
 5. Validate at least one simple product, one product with attributes, and one out-of-stock product.
 

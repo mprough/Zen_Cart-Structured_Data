@@ -746,8 +746,17 @@ if (defined('PLUGIN_SUPERDATA_VALID_FROM_ENABLE') && PLUGIN_SUPERDATA_VALID_FROM
     $offerEnhancements['validFrom'] = date('Y-m-d', $validFromTimestamp !== false ? $validFromTimestamp : time());
 }
 
+$shippingRateMode = defined('PLUGIN_SUPERDATA_SHIPPING_RATE_MODE')
+    ? PLUGIN_SUPERDATA_SHIPPING_RATE_MODE
+    : 'MerchantCenter';
+
 if (defined('PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE')
     && PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE === 'true'
+    && in_array($shippingRateMode, ['Free', 'FlatRate'], true)
+    && ($shippingRateMode === 'Free'
+        || (defined('PLUGIN_SUPERDATA_SHIPPING_RATE')
+            && trim(PLUGIN_SUPERDATA_SHIPPING_RATE) !== ''
+            && is_numeric(PLUGIN_SUPERDATA_SHIPPING_RATE)))
     && defined('PLUGIN_SUPERDATA_SHIPPING_COUNTRY')
     && trim(PLUGIN_SUPERDATA_SHIPPING_COUNTRY) !== '') {
     $shippingCurrency = defined('PLUGIN_SUPERDATA_PRICE_CURRENCY') && PLUGIN_SUPERDATA_PRICE_CURRENCY !== ''
@@ -762,7 +771,9 @@ if (defined('PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE')
         ],
         'shippingRate' => [
             '@type' => 'MonetaryAmount',
-            'value' => number_format((float)PLUGIN_SUPERDATA_SHIPPING_RATE, $decimal_places, '.', ''),
+            'value' => $shippingRateMode === 'Free'
+                ? number_format(0, $decimal_places, '.', '')
+                : number_format((float)PLUGIN_SUPERDATA_SHIPPING_RATE, $decimal_places, '.', ''),
             'currency' => $shippingCurrency,
         ],
         'deliveryTime' => [
