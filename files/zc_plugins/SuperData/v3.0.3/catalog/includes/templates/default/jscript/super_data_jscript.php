@@ -817,6 +817,13 @@ if ($applicableReturnCountry !== '' && isset($returnPolicyCategory[PLUGIN_SUPERD
         $policyData['returnMethod'] = $returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD];
     }
 
+    $validRefundTypes = ['FullRefund', 'StoreCreditRefund', 'ExchangeRefund'];
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted'
+        && defined('PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE')
+        && in_array(PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE, $validRefundTypes, true)) {
+        $policyData['refundType'] = 'https://schema.org/' . PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE;
+    }
+
     if (PLUGIN_SUPERDATA_RETURNS_POLICY === 'Finite') {
         $policyData['merchantReturnDays'] = (int)PLUGIN_SUPERDATA_RETURNS_DAYS;
     }

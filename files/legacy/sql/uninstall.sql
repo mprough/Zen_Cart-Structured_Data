@@ -1,4 +1,4 @@
-# SuperData 3.0.2 legacy uninstaller
+# SuperData 3.0.3 legacy uninstaller
 # This removes SuperData's settings. It does not remove former PLUGIN_SDATA_* settings.
 
 DELETE FROM admin_pages WHERE page_key = 'configSuperData';

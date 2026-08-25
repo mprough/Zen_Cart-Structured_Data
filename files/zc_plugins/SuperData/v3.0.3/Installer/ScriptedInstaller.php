@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'SuperData';
 
-    public string $version = '3.0.2';
+    public string $version = '3.0.3';
 
 
 
@@ -57,7 +57,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Facebook Admin ID (optional)', 'PLUGIN_SUPERDATA_FOG_ADMINID', '', 'Enter the Admin ID(s) of the Facebook user(s) that administer your Facebook fan page separated by commas. <a href=\"https://business.facebook.com\" target=\"_blank\">Facebook Business</a>.', $this->cgi, 6, null),
                 ('Facebook Page (optional)', 'PLUGIN_SUPERDATA_FOG_PAGE', '', 'Enter the full url/link to your facebook page e.g.: https://www.facebook.com/zencart/.', $this->cgi, 7, null),
 
-                ('Organisation Type', 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE', 'Organization', 'If you have a physical store and want to specify it, choose LocalBusiness instead of the generic Organization.', $this->cgi, 8, 'zen_cfg_select_option(array(\'Organization\', \'LocalBusiness\', \'OnlineBusiness\'),'),
+                ('Organization Type', 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE', 'Organization', 'If you have a physical store and want to specify it, choose LocalBusiness instead of the generic Organization.', $this->cgi, 8, 'zen_cfg_select_option(array(\'Organization\', \'LocalBusiness\', \'OnlineBusiness\'),'),
 
                 ('LocalBusiness Type', 'PLUGIN_SUPERDATA_LOCAL_BUSINESS_TYPE', 'Store', 'This option is used ONLY if Organization Type is set to LocalBusiness. The list is not complete because there is a large number of options. Choose the one that fits best, or choose Store as a generic option.', $this->cgi, 9, 'zen_cfg_select_option(array(\'Store\', \'ShoppingCenter\', \'BikeStore\', \'BookStore\', \'ClothingStore\', \'ComputerStore\', \'ConvenienceStore\', \'DepartmentStore\', \'ElectronicsStore\', \'Florist\', \'FurnitureStore\', \'GardenStore\', \'GroceryStore\', \'HardwareStore\', \'HobbyShop\', \'HomeGoodsStore\', \'JewelryStore\', \'LiquorStore\', \'MensClothingStore\', \'MobilePhoneStore\', \'MovieRentalStore\', \'MusicStore\', \'OfficeEquipmentStore\', \'OutletStore\', \'PawnShop\', \'PetStore\', \'ShoeStore\', \'SportingGoodsStore\', \'TireShop\', \'ToyStore\', \'WholesaleStore\'),'),
 
@@ -132,6 +132,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Returns - Days', 'PLUGIN_SUPERDATA_RETURNS_DAYS', '14', 'In the case of the Finite return policy, the period (days limit) during which the product can be returned.', $this->cgi, 255, null),
                 ('Returns - Methods', 'PLUGIN_SUPERDATA_RETURNS_METHOD', 'Mail', 'In the case of the Finite/Unlimited return policies, the method of returning the product.', $this->cgi, 260, 'zen_cfg_select_option(array(\'Kiosk\', \'Mail\', \'Store\'),'),
                 ('Returns - Type', 'PLUGIN_SUPERDATA_RETURNS_TYPE', 'FreeReturn', 'The type of fee for returns. Ignored when returns are not permitted.', $this->cgi, 265, 'zen_cfg_select_option(array(\'FreeReturn\', \'OriginalShippingFees\', \'RestockingFees\', \'ReturnFeesCustomerResponsibility\', \'ReturnShippingFees\'),'),
+                ('Returns - Refund Type', 'PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE', 'FullRefund', 'Refund provided for an accepted return. Choose FullRefund for a full monetary refund, StoreCreditRefund for store credit, or ExchangeRefund when the item is exchanged for the same product. Ignored when returns are not permitted.', $this->cgi, 268, 'zen_cfg_select_option(array(\'FullRefund\', \'StoreCreditRefund\', \'ExchangeRefund\'),'),
                 ('Returns - Fee', 'PLUGIN_SUPERDATA_RETURNS_FEE', '0', 'The charge to the customer for returning the product. You can enter a fixed amount or percentage. If you add percentage, the value will be calculated as percentage of the item price.', $this->cgi, 270, null),
                 ('Returns - Applicable Country', 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY', '', '<strong>Required to publish hasMerchantReturnPolicy.</strong> Enter the two-letter ISO country code where this policy applies, for example US. Separate multiple countries with commas.', $this->cgi, 275, null),
                 ('Returns - Return Destination Country', 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY', '', 'Optional two-letter ISO country code where returned products must be sent. This no longer controls whether the return policy is published.', $this->cgi, 280, null),
@@ -196,7 +197,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                     (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function)
                 VALUES
 
-                ('Organisation Type', 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE', 'Organization', 'If you have a physical store and want to specify it, choose LocalBusiness instead of the generic Organization.', $this->cgi, 8, 'zen_cfg_select_option(array(\'Organization\', \'LocalBusiness\', \'OnlineBusiness\'),'),
+                ('Organization Type', 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE', 'Organization', 'If you have a physical store and want to specify it, choose LocalBusiness instead of the generic Organization.', $this->cgi, 8, 'zen_cfg_select_option(array(\'Organization\', \'LocalBusiness\', \'OnlineBusiness\'),'),
 
                 ('LocalBusiness Type', 'PLUGIN_SUPERDATA_LOCAL_BUSINESS_TYPE', 'Store', 'This option is used ONLY if Organization Type is set to LocalBusiness. The list is not complete because there is a large number of options. Choose the one that fits best, or choose Store as a generic option.', $this->cgi, 9, 'zen_cfg_select_option(array(\'Store\', \'ShoppingCenter\', \'BikeStore\', \'BookStore\', \'ClothingStore\', \'ComputerStore\', \'ConvenienceStore\', \'DepartmentStore\', \'ElectronicsStore\', \'Florist\', \'FurnitureStore\', \'GardenStore\', \'GroceryStore\', \'HardwareStore\', \'HobbyShop\', \'HomeGoodsStore\', \'JewelryStore\', \'LiquorStore\', \'MensClothingStore\', \'MobilePhoneStore\', \'MovieRentalStore\', \'MusicStore\', \'OfficeEquipmentStore\', \'OutletStore\', \'PawnShop\', \'PetStore\', \'ShoeStore\', \'SportingGoodsStore\', \'TireShop\', \'ToyStore\', \'WholesaleStore\'),'),
 
@@ -266,9 +267,14 @@ class ScriptedInstaller extends ScriptedInstallBase
                 $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = 'The country in which the returns policy is applicable (2-char ISO e.g. ES) For worldwide, enter **.', sort_order = 275 WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY'");
                 break;
         }
+        $this->executeInstallerSql("INSERT IGNORE INTO " . TABLE_CONFIGURATION . "
+            (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function)
+            VALUES
+            ('Returns - Refund Type', 'PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE', 'FullRefund', 'Refund provided for an accepted return. Choose FullRefund for a full monetary refund, StoreCreditRefund for store credit, or ExchangeRefund when the item is exchanged for the same product. Ignored when returns are not permitted.', $this->cgi, 268, 'zen_cfg_select_option(array(\'FullRefund\', \'StoreCreditRefund\', \'ExchangeRefund\'),')");
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Business Image (Schema, optional)', configuration_description = 'Image for Organization, OnlineBusiness, OnlineStore, or LocalBusiness markup. Enter one complete image URL or multiple URLs separated by commas. If blank, SuperData uses the configured Logo so the Schema image field is not missing.' WHERE configuration_key = 'PLUGIN_SUPERDATA_PROPERTY_IMAGE'");
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = '<strong>Required to publish hasMerchantReturnPolicy.</strong> Enter the two-letter ISO country code where this policy applies, for example US. Separate multiple countries with commas.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY'");
         $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Returns - Return Destination Country', configuration_description = 'Optional two-letter ISO country code where returned products must be sent. This no longer controls whether the return policy is published.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY'");
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Organization Type' WHERE configuration_key = 'PLUGIN_SUPERDATA_ORGANIZATION_TYPE'");
         return true;
     }
 

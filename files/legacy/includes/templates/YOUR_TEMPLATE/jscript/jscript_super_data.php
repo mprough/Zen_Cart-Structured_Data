@@ -85,6 +85,7 @@ $superDataLegacyDefaults = [
     'PLUGIN_SUPERDATA_RETURNS_DAYS' => '14',
     'PLUGIN_SUPERDATA_RETURNS_METHOD' => 'Mail',
     'PLUGIN_SUPERDATA_RETURNS_TYPE' => 'FreeReturn',
+    'PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE' => 'FullRefund',
     'PLUGIN_SUPERDATA_RETURNS_FEE' => '0',
     'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY' => '',
     'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY' => '',
@@ -905,6 +906,13 @@ if ($applicableReturnCountry !== '' && isset($returnPolicyCategory[PLUGIN_SUPERD
     if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted'
         && isset($returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD])) {
         $policyData['returnMethod'] = $returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD];
+    }
+
+    $validRefundTypes = ['FullRefund', 'StoreCreditRefund', 'ExchangeRefund'];
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted'
+        && defined('PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE')
+        && in_array(PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE, $validRefundTypes, true)) {
+        $policyData['refundType'] = 'https://schema.org/' . PLUGIN_SUPERDATA_RETURNS_REFUND_TYPE;
     }
 
     if (PLUGIN_SUPERDATA_RETURNS_POLICY === 'Finite') {
