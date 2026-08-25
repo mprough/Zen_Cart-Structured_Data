@@ -6,7 +6,7 @@ declare(strict_types=1);
  * @author: torvista
  * @link: https://github.com/torvista/Zen_Cart-Structured_Data
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version auto.structured_data.php torvista 27 Feb 2026
+ * @version auto.super_data.php torvista 27 Feb 2026
  */
 use Zencart\DbRepositories\PluginControlRepository;
 use Zencart\DbRepositories\PluginControlVersionRepository;
@@ -16,7 +16,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-class zcObserverStructuredData extends base
+class zcObserverSuperData extends base
 {
     public bool $enabled;
 
@@ -26,7 +26,7 @@ class zcObserverStructuredData extends base
     public function __construct()
     {
         $this->debug = false;
-        $this->enabled = (defined('PLUGIN_SDATA_ENABLE') && PLUGIN_SDATA_ENABLE === 'true');
+        $this->enabled = (defined('PLUGIN_SUPERDATA_ENABLE') && PLUGIN_SUPERDATA_ENABLE === 'true');
         if ($this->enabled === false) {
             return;
         }
@@ -37,7 +37,7 @@ class zcObserverStructuredData extends base
         $this->zcPluginDir = str_replace(
             DIR_FS_CATALOG,
             '',
-            $plugin_manager->getPluginVersionDirectory('StructuredData', $plugin_manager->getInstalledPlugins()) . 'catalog/'
+            $plugin_manager->getPluginVersionDirectory('SuperData', $plugin_manager->getInstalledPlugins()) . 'catalog/'
         );
 
         // Observers
@@ -60,7 +60,7 @@ class zcObserverStructuredData extends base
     protected function notify_html_head_end(&$class, string $e): void
     {
         global $breadcrumb, $canonicalLink, $current_page_base, $db, $lng, $product_info, $reviewsArray, $sniffer;
-        include $this->getZcPluginDir() . DIR_WS_TEMPLATES . 'default/jscript/structured_data_jscript.php';
+        include $this->getZcPluginDir() . DIR_WS_TEMPLATES . 'default/jscript/super_data_jscript.php';
     }
 
     /**

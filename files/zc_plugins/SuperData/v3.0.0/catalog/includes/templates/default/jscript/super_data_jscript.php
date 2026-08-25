@@ -8,7 +8,7 @@ declare(strict_types=1);
  * @author: torvista
  * @link: https://github.com/torvista/Zen_Cart-Structured_Data
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version structured_data_jscript.php 16 August 2026 torvista
+ * @version super_data_jscript.php 16 August 2026 torvista
  */
 
 /** directives for phpStorm code inspector
@@ -23,7 +23,7 @@ declare(strict_types=1);
  * @var sniffer $sniffer
  */
 // @formatter:off
-if (!defined('PLUGIN_SDATA_ENABLE') || PLUGIN_SDATA_ENABLE !== 'true') {
+if (!defined('PLUGIN_SUPERDATA_ENABLE') || PLUGIN_SUPERDATA_ENABLE !== 'true') {
     return;
 }
 // Set to true (boolean) to display debugging info.
@@ -175,10 +175,12 @@ function sdata_printvar($a): void
  * @param $value
  * @return array|mixed
  */
-function sdata_clean_schema($value):mixed {
+function sdata_clean_schema($value) {
     if (is_array($value)) {
         $value = array_map('sdata_clean_schema', $value);
-        $value = array_filter($value, fn($v) => $v !== '' && $v !== [] && $v !== null);
+        $value = array_filter($value, static function ($v) {
+            return $v !== '' && $v !== [] && $v !== null;
+        });
     }
     return $value;
 }
@@ -223,17 +225,17 @@ global $currencies;
 $decimal_places = $currencies->currencies[DEFAULT_CURRENCY]['decimal_places'];
 
 // Images
-if (PLUGIN_SDATA_FOG_DEFAULT_IMAGE !== '') {
-    $image_default_facebook = PLUGIN_SDATA_FOG_DEFAULT_IMAGE;
-} elseif (PLUGIN_SDATA_LOGO !== '') {
-    $image_default_facebook = PLUGIN_SDATA_LOGO;
+if (PLUGIN_SUPERDATA_FOG_DEFAULT_IMAGE !== '') {
+    $image_default_facebook = PLUGIN_SUPERDATA_FOG_DEFAULT_IMAGE;
+} elseif (PLUGIN_SUPERDATA_LOGO !== '') {
+    $image_default_facebook = PLUGIN_SUPERDATA_LOGO;
 } else {
     $image_default_facebook = HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_IMAGES . PRODUCTS_IMAGE_NO_IMAGE;
 }
-if (PLUGIN_SDATA_TWITTER_DEFAULT_IMAGE !== '') {
-    $image_default_twitter = PLUGIN_SDATA_TWITTER_DEFAULT_IMAGE;
-} elseif (PLUGIN_SDATA_LOGO !== '') {
-    $image_default_twitter = PLUGIN_SDATA_LOGO;
+if (PLUGIN_SUPERDATA_TWITTER_DEFAULT_IMAGE !== '') {
+    $image_default_twitter = PLUGIN_SUPERDATA_TWITTER_DEFAULT_IMAGE;
+} elseif (PLUGIN_SUPERDATA_LOGO !== '') {
+    $image_default_twitter = PLUGIN_SUPERDATA_LOGO;
 } else {
     $image_default_twitter = HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_IMAGES . PRODUCTS_IMAGE_NO_IMAGE;
 }
@@ -242,7 +244,7 @@ if (PLUGIN_SDATA_TWITTER_DEFAULT_IMAGE !== '') {
 $page_type = '';
 global $current_category_has_products, $current_category_has_subcats, $current_category_id, $listing_sql;
 
-if (str_ends_with($current_page_base, '_info')
+if (substr($current_page_base, -5) === '_info'
     && !empty($_GET['products_id'])
     && zen_get_info_page($_GET['products_id']) === $current_page_base
     && (isset($product_info) && is_object($product_info))
@@ -271,7 +273,7 @@ switch ($page_type) {
         // NOTE: kept unescaped here (like $description/$category_name elsewhere in this file) -
         // it's HTML-escaped once, at each point it's actually echoed into an attribute, below.
         $title = STORE_NAME . ' - ' . $product_name;
-        $weight = (float)($product_info->fields['products_weight'] === '0' ? PLUGIN_SDATA_DEFAULT_WEIGHT : $product_info->fields['products_weight']);
+        $weight = (float)($product_info->fields['products_weight'] === '0' ? PLUGIN_SUPERDATA_DEFAULT_WEIGHT : $product_info->fields['products_weight']);
         $tax_class_id = (int)$product_info->fields['products_tax_class_id'];
         if ($product_info->fields['product_is_call'] === '1') {
             $product_base_displayed_price = 0;
@@ -283,13 +285,16 @@ switch ($page_type) {
             );
         }
         $product_date_added = $product_info->fields['products_date_added']; // Should never be default '0001-01-01 00:00:00'
+        $product_date_available = isset($product_info->fields['products_date_available'])
+            ? $product_info->fields['products_date_available']
+            : '';
         $manufacturer_name = zen_get_products_manufacturers_name($product_id);
         $product_base_stock = $product_info->fields['products_quantity'];
 
         // OOS BackOrder/PreSales need to have a date field
-        $oosItemAvailability = array_key_exists(PLUGIN_SDATA_OOS_DEFAULT, $itemAvailability) ? $itemAvailability[PLUGIN_SDATA_OOS_DEFAULT] : $itemAvailability['OutOfStock'];
-        if (PLUGIN_SDATA_OOS_DEFAULT === 'BackOrder' || PLUGIN_SDATA_OOS_DEFAULT === 'PreSales') {
-            $backPreOrderDate = date('Y-m-d', strtotime('+' . (int)PLUGIN_SDATA_OOS_AVAILABILITY_DELAY . ' days'));
+        $oosItemAvailability = array_key_exists(PLUGIN_SUPERDATA_OOS_DEFAULT, $itemAvailability) ? $itemAvailability[PLUGIN_SUPERDATA_OOS_DEFAULT] : $itemAvailability['OutOfStock'];
+        if (PLUGIN_SUPERDATA_OOS_DEFAULT === 'BackOrder' || PLUGIN_SUPERDATA_OOS_DEFAULT === 'PreSales') {
+            $backPreOrderDate = date('Y-m-d', strtotime('+' . (int)PLUGIN_SUPERDATA_OOS_AVAILABILITY_DELAY . ' days'));
         } else {
             $backPreOrderDate = '';
         }
@@ -303,7 +308,7 @@ switch ($page_type) {
         // Google Product Category
         // A field for Google Product Category needs to be added to the product table unless all products are under the same category.
         // Initialize with the default category
-        $product_base_gpc = (int)PLUGIN_SDATA_GOOGLE_PRODUCT_CATEGORY;
+        $product_base_gpc = (int)PLUGIN_SUPERDATA_GOOGLE_PRODUCT_CATEGORY;
 
         // GTIN: a standardized international code UPC / GTIN-12 / EAN / JAN / ISBN / ITF-14. It may be subsequently updated by attribute data.
         // A field for GTIN needs to be added to the product table.
@@ -313,18 +318,18 @@ switch ($page_type) {
         $product_base_productID = $product_base_gtin;
 
         // Get base (non-attribute) GPC and GTIN from custom fields
-        if ($sniffer->field_exists(TABLE_PRODUCTS, PLUGIN_SDATA_GPC_FIELD)) {
-            $sql = 'SELECT ' . PLUGIN_SDATA_GPC_FIELD . ' FROM ' . TABLE_PRODUCTS . ' WHERE products_id = ' . $product_id;
+        if ($sniffer->field_exists(TABLE_PRODUCTS, PLUGIN_SUPERDATA_GPC_FIELD)) {
+            $sql = 'SELECT ' . PLUGIN_SUPERDATA_GPC_FIELD . ' FROM ' . TABLE_PRODUCTS . ' WHERE products_id = ' . $product_id;
             $result = $db->Execute($sql);
-            $product_base_gpc = !empty($result->fields[PLUGIN_SDATA_GPC_FIELD]) ? $result->fields[PLUGIN_SDATA_GPC_FIELD] : (int)PLUGIN_SDATA_GOOGLE_PRODUCT_CATEGORY;
+            $product_base_gpc = !empty($result->fields[PLUGIN_SUPERDATA_GPC_FIELD]) ? $result->fields[PLUGIN_SUPERDATA_GPC_FIELD] : (int)PLUGIN_SUPERDATA_GOOGLE_PRODUCT_CATEGORY;
         }
-        if ($sniffer->field_exists(TABLE_PRODUCTS, PLUGIN_SDATA_GTIN_FIELD)) {
-            $sql = 'SELECT ' . PLUGIN_SDATA_GTIN_FIELD . ' FROM ' . TABLE_PRODUCTS . ' WHERE products_id = ' . $product_id;
+        if ($sniffer->field_exists(TABLE_PRODUCTS, PLUGIN_SUPERDATA_GTIN_FIELD)) {
+            $sql = 'SELECT ' . PLUGIN_SUPERDATA_GTIN_FIELD . ' FROM ' . TABLE_PRODUCTS . ' WHERE products_id = ' . $product_id;
             $result = $db->Execute($sql);
             //Google Merchant Center feed complains if no GTIN. I use "no" in this field to omit that product from that feed.
-            $product_base_gtin = (empty($result->fields[PLUGIN_SDATA_GTIN_FIELD]) || $result->fields[PLUGIN_SDATA_GTIN_FIELD] === 'no')
+            $product_base_gtin = (empty($result->fields[PLUGIN_SUPERDATA_GTIN_FIELD]) || $result->fields[PLUGIN_SUPERDATA_GTIN_FIELD] === 'no')
                 ? ''
-                : $result->fields[PLUGIN_SDATA_GTIN_FIELD];
+                : $result->fields[PLUGIN_SUPERDATA_GTIN_FIELD];
         }
 
         //ATTRIBUTES
@@ -511,8 +516,8 @@ switch ($page_type) {
             }//Image Handler is in use
             $image = HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_IMAGES . $product_image;
         } else {//no image defined in product info
-            //note PLUGIN_SDATA_FOG_DEFAULT_PRODUCT_IMAGE is a FULL path with protocol
-            $image = (PLUGIN_SDATA_FOG_DEFAULT_PRODUCT_IMAGE !== '' ? PLUGIN_SDATA_FOG_DEFAULT_PRODUCT_IMAGE
+            //note PLUGIN_SUPERDATA_FOG_DEFAULT_PRODUCT_IMAGE is a FULL path with protocol
+            $image = (PLUGIN_SUPERDATA_FOG_DEFAULT_PRODUCT_IMAGE !== '' ? PLUGIN_SUPERDATA_FOG_DEFAULT_PRODUCT_IMAGE
                 : HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_IMAGES . PRODUCTS_IMAGE_NO_IMAGE);//if no default image, use standard no-image file.
         }
 
@@ -624,16 +629,18 @@ $description = sdata_prepare_string($description);
 // ZenExpert - note: Contact Us page should NOT be in sameAs list if it's not an external link
 $sameAs = [];
 
-// Add the comma-separated list from PLUGIN_SDATA_SAMEAS
-if (PLUGIN_SDATA_SAMEAS !== '') {
+// Add the comma-separated list from PLUGIN_SUPERDATA_SAMEAS
+if (PLUGIN_SUPERDATA_SAMEAS !== '') {
     $sameAs = array_map(
-        static fn($url) => trim($url, " \t\n\r\0\x0B\"'"),
-        explode(',', PLUGIN_SDATA_SAMEAS)
+        static function ($url) {
+            return trim($url, " \t\n\r\0\x0B\"'");
+        },
+        explode(',', PLUGIN_SUPERDATA_SAMEAS)
     );
 }
 
 // Add individual social URLs
-foreach ([PLUGIN_SDATA_FOG_PAGE, PLUGIN_SDATA_TWITTER_PAGE, PLUGIN_SDATA_GOOGLE_PUBLISHER] as $url) {
+foreach ([PLUGIN_SUPERDATA_FOG_PAGE, PLUGIN_SUPERDATA_TWITTER_PAGE, PLUGIN_SUPERDATA_GOOGLE_PUBLISHER] as $url) {
     if (!empty($url)) {
         $sameAs[] = trim($url, " \t\n\r\0\x0B\"'");
     }
@@ -645,13 +652,13 @@ $sameAs = array_values(array_filter(array_unique($sameAs)));
 // Build acceptedPaymentMethod list
 $PaymentMethods = [];
 
-$PaymentMethod_array = explode(', ', PLUGIN_SDATA_ACCEPTED_PAYMENT_METHODS);
+$PaymentMethod_array = explode(', ', PLUGIN_SUPERDATA_ACCEPTED_PAYMENT_METHODS);
 foreach ($PaymentMethod_array as $payment_method) {
     $PaymentMethods[] = "https://purl.org/goodrelations/v1#" . trim($payment_method);
 }
 
 //build Facebook locales
-$locales_array = explode(',', PLUGIN_SDATA_FOG_LOCALES);
+$locales_array = explode(',', PLUGIN_SUPERDATA_FOG_LOCALES);
 $locales_array = array_map('trim', $locales_array);
 /* Array example
 (
@@ -704,7 +711,7 @@ if ($page_type === 'product') {
                     'id' => $review['reviews_id'],
                     'customersName' => $review['customers_name'],
                     'reviewsRating' => $review['reviews_rating'],
-                    'dateAdded' => (!empty($review['date_added']) ? $review['date_added'] : PLUGIN_SDATA_REVIEW_DEFAULT_DATE), // $review['date_added'] may be NULL
+                    'dateAdded' => (!empty($review['date_added']) ? $review['date_added'] : PLUGIN_SUPERDATA_REVIEW_DEFAULT_DATE), // $review['date_added'] may be NULL
                     'reviewsText' => $review['reviews_text']
                 ];
                 $ratingSum += $review['reviews_rating']; // mc12345678 2022-07-04: If going to omit this review now or in the future, then need to consider this value.
@@ -712,40 +719,89 @@ if ($page_type === 'product') {
         }
     }
 // if no reviews, make a default review to satisfy Rich Results testing tool
-    if (count($reviewsArr) === 0 && PLUGIN_SDATA_REVIEW_USE_DEFAULT === 'true') {
+    if (count($reviewsArr) === 0 && PLUGIN_SUPERDATA_REVIEW_USE_DEFAULT === 'true') {
         $reviewsArr[0] = [
             'id' => 0, // not used
             'customersName' => 'anonymous',
-            'reviewsRating' => (int)PLUGIN_SDATA_REVIEW_DEFAULT_VALUE,
+            'reviewsRating' => (int)PLUGIN_SUPERDATA_REVIEW_DEFAULT_VALUE,
             'dateAdded' => $product_date_added,
             'reviewsText' => ''
         ];
-        $ratingSum = (int)PLUGIN_SDATA_REVIEW_DEFAULT_VALUE;
+        $ratingSum = (int)PLUGIN_SUPERDATA_REVIEW_DEFAULT_VALUE;
     }
 
     $reviewCount = count($reviewsArr);
     $ratingValue = round($ratingSum / $reviewCount, 1);
 }
 
-//Merchant Return Policy
+// Common Offer enhancements. These are assembled once and applied to every
+// simple, attribute and aggregate offer so no product path silently omits them.
+$offerEnhancements = [];
+
+if (defined('PLUGIN_SUPERDATA_VALID_FROM_ENABLE') && PLUGIN_SUPERDATA_VALID_FROM_ENABLE === 'true') {
+    $validFromSource = !empty($product_date_available) && strtotime($product_date_available) > time()
+        ? $product_date_available
+        : $product_date_added;
+    $validFromTimestamp = strtotime((string)$validFromSource);
+    $offerEnhancements['validFrom'] = date('Y-m-d', $validFromTimestamp !== false ? $validFromTimestamp : time());
+}
+
+if (defined('PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE')
+    && PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE === 'true'
+    && defined('PLUGIN_SUPERDATA_SHIPPING_COUNTRY')
+    && trim(PLUGIN_SUPERDATA_SHIPPING_COUNTRY) !== '') {
+    $shippingCurrency = defined('PLUGIN_SUPERDATA_PRICE_CURRENCY') && PLUGIN_SUPERDATA_PRICE_CURRENCY !== ''
+        ? PLUGIN_SUPERDATA_PRICE_CURRENCY
+        : DEFAULT_CURRENCY;
+
+    $offerEnhancements['shippingDetails'] = [
+        '@type' => 'OfferShippingDetails',
+        'shippingDestination' => [
+            '@type' => 'DefinedRegion',
+            'addressCountry' => strtoupper(trim(PLUGIN_SUPERDATA_SHIPPING_COUNTRY)),
+        ],
+        'shippingRate' => [
+            '@type' => 'MonetaryAmount',
+            'value' => number_format((float)PLUGIN_SUPERDATA_SHIPPING_RATE, $decimal_places, '.', ''),
+            'currency' => $shippingCurrency,
+        ],
+        'deliveryTime' => [
+            '@type' => 'ShippingDeliveryTime',
+            'handlingTime' => [
+                '@type' => 'QuantitativeValue',
+                'minValue' => max(0, (int)PLUGIN_SUPERDATA_HANDLING_MIN_DAYS),
+                'maxValue' => max(0, (int)PLUGIN_SUPERDATA_HANDLING_MAX_DAYS),
+                'unitCode' => 'DAY',
+            ],
+            'transitTime' => [
+                '@type' => 'QuantitativeValue',
+                'minValue' => max(0, (int)PLUGIN_SUPERDATA_TRANSIT_MIN_DAYS),
+                'maxValue' => max(0, (int)PLUGIN_SUPERDATA_TRANSIT_MAX_DAYS),
+                'unitCode' => 'DAY',
+            ],
+        ],
+    ];
+}
+
+// Merchant Return Policy
 //common code block used in attribute-handling option and simple product
 $hasMerchantReturnPolicy = [];
 
-if (!empty(PLUGIN_SDATA_RETURNS_POLICY_COUNTRY)) {
+if (!empty(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY)) {
     $policyData = [
         '@type' => 'MerchantReturnPolicy',
-        'applicableCountry' => PLUGIN_SDATA_RETURNS_APPLICABLE_COUNTRY,
-        'returnPolicyCategory' => $returnPolicyCategory[PLUGIN_SDATA_RETURNS_POLICY],
-        'returnMethod' => $returnMethod[PLUGIN_SDATA_RETURNS_METHOD]
+        'applicableCountry' => PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY,
+        'returnPolicyCategory' => $returnPolicyCategory[PLUGIN_SUPERDATA_RETURNS_POLICY],
+        'returnMethod' => $returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD]
     ];
 
-    if (PLUGIN_SDATA_RETURNS_POLICY === 'Finite') {
-        $policyData['merchantReturnDays'] = (int)PLUGIN_SDATA_RETURNS_DAYS;
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY === 'Finite') {
+        $policyData['merchantReturnDays'] = (int)PLUGIN_SUPERDATA_RETURNS_DAYS;
     }
 
-    $rType = defined('PLUGIN_SDATA_RETURNS_TYPE') ? PLUGIN_SDATA_RETURNS_TYPE : 'FreeReturn';
-    $rFeeVal = defined('PLUGIN_SDATA_RETURNS_FEE') ? PLUGIN_SDATA_RETURNS_FEE : '0';
-    $rCurrency = defined('PLUGIN_SDATA_PRICE_CURRENCY') ? PLUGIN_SDATA_PRICE_CURRENCY : 'GBP';
+    $rType = defined('PLUGIN_SUPERDATA_RETURNS_TYPE') ? PLUGIN_SUPERDATA_RETURNS_TYPE : 'FreeReturn';
+    $rFeeVal = defined('PLUGIN_SUPERDATA_RETURNS_FEE') ? PLUGIN_SUPERDATA_RETURNS_FEE : '0';
+    $rCurrency = defined('PLUGIN_SUPERDATA_PRICE_CURRENCY') ? PLUGIN_SUPERDATA_PRICE_CURRENCY : 'GBP';
 
     // Set the Schema URL for the fee type
     if ($rType === 'RestockingFees') {
@@ -758,7 +814,7 @@ if (!empty(PLUGIN_SDATA_RETURNS_POLICY_COUNTRY)) {
     // Handle "RestockingFees" (Percentage or Fixed)
     if ($rType === 'RestockingFees') {
         // Check for percentage
-        if (str_contains($rFeeVal, '%')) {
+        if (strpos($rFeeVal, '%') !== false) {
             // It is a percentage (e.g. "20%")
             $policyData['description'] = "A restocking fee of $rFeeVal applies to returned items.";
 
@@ -797,24 +853,24 @@ if (!empty(PLUGIN_SDATA_RETURNS_POLICY_COUNTRY)) {
 }
 ?>
 <?php
-if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
+if (PLUGIN_SUPERDATA_SCHEMA_ENABLE === 'true') {
     /*
      * Organisation Schema
      */
 
     $organization_type = 'Organization';
 
-    if (defined('PLUGIN_SDATA_ORGANIZATION_TYPE') && PLUGIN_SDATA_ORGANIZATION_TYPE !== '') {
+    if (defined('PLUGIN_SUPERDATA_ORGANIZATION_TYPE') && PLUGIN_SUPERDATA_ORGANIZATION_TYPE !== '') {
 
         // LocalBusiness or subtype
-        if (PLUGIN_SDATA_ORGANIZATION_TYPE === 'LocalBusiness') {
+        if (PLUGIN_SUPERDATA_ORGANIZATION_TYPE === 'LocalBusiness') {
             $organization_type =
-                (defined('PLUGIN_SDATA_LOCAL_BUSINESS_TYPE') && PLUGIN_SDATA_LOCAL_BUSINESS_TYPE !== '')
-                    ? PLUGIN_SDATA_LOCAL_BUSINESS_TYPE
+                (defined('PLUGIN_SUPERDATA_LOCAL_BUSINESS_TYPE') && PLUGIN_SUPERDATA_LOCAL_BUSINESS_TYPE !== '')
+                    ? PLUGIN_SUPERDATA_LOCAL_BUSINESS_TYPE
                     : 'LocalBusiness';
         // Any other valid type
         } else {
-            $organization_type = PLUGIN_SDATA_ORGANIZATION_TYPE;
+            $organization_type = PLUGIN_SUPERDATA_ORGANIZATION_TYPE;
         }
     }
 
@@ -826,43 +882,43 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
         '@type' => $organization_type,
 
         // Core fields
-        'name' => PLUGIN_SDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SDATA_LEGAL_NAME ?: STORE_NAME,
-        'legalName' => PLUGIN_SDATA_LEGAL_NAME,
-        'description' => sdata_prepare_string(PLUGIN_SDATA_DESCRIPTION),
+        'name' => PLUGIN_SUPERDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SUPERDATA_LEGAL_NAME ?: STORE_NAME,
+        'legalName' => PLUGIN_SUPERDATA_LEGAL_NAME,
+        'description' => sdata_prepare_string(PLUGIN_SUPERDATA_DESCRIPTION),
         'url' => HTTP_SERVER,
-        'logo' => PLUGIN_SDATA_LOGO,
-        'email' => PLUGIN_SDATA_EMAIL,
-        'telephone' => PLUGIN_SDATA_TELEPHONE,
-        'faxNumber' => PLUGIN_SDATA_FAX,
+        'logo' => PLUGIN_SUPERDATA_LOGO,
+        'email' => PLUGIN_SUPERDATA_EMAIL,
+        'telephone' => PLUGIN_SUPERDATA_TELEPHONE,
+        'faxNumber' => PLUGIN_SUPERDATA_FAX,
 
         // Identifiers
-        'duns' => PLUGIN_SDATA_DUNS,
-        'taxID' => PLUGIN_SDATA_TAXID,
-        'vatID' => PLUGIN_SDATA_VATID,
+        'duns' => PLUGIN_SUPERDATA_DUNS,
+        'taxID' => PLUGIN_SUPERDATA_TAXID,
+        'vatID' => PLUGIN_SUPERDATA_VATID,
 
         // Address
         'address' => [
             '@type' => 'PostalAddress',
-            'streetAddress' => PLUGIN_SDATA_STREET_ADDRESS,
-            'addressLocality' => PLUGIN_SDATA_LOCALITY,
-            'addressRegion' => PLUGIN_SDATA_REGION,
-            'postalCode' => PLUGIN_SDATA_POSTALCODE,
-            'addressCountry' => PLUGIN_SDATA_COUNTRYNAME,
+            'streetAddress' => PLUGIN_SUPERDATA_STREET_ADDRESS,
+            'addressLocality' => PLUGIN_SUPERDATA_LOCALITY,
+            'addressRegion' => PLUGIN_SUPERDATA_REGION,
+            'postalCode' => PLUGIN_SUPERDATA_POSTALCODE,
+            'addressCountry' => PLUGIN_SUPERDATA_COUNTRYNAME,
         ],
 
         // Contact point
         'contactPoint' => [
             [
                 '@type' => 'ContactPoint',
-                'telephone' => PLUGIN_SDATA_TELEPHONE,
+                'telephone' => PLUGIN_SUPERDATA_TELEPHONE,
                 'contactType' => 'customer service',
             ]
         ],
 
         // Optional arrays
         'sameAs' => $sameAs,
-        'areaServed' => (PLUGIN_SDATA_AREA_SERVED !== '' ? array_map('trim', explode(',', PLUGIN_SDATA_AREA_SERVED)) : []),
-        'availableLanguage' => (PLUGIN_SDATA_AVAILABLE_LANGUAGE !== '' ? array_map('trim', explode(',', PLUGIN_SDATA_AVAILABLE_LANGUAGE)) : []),
+        'areaServed' => (PLUGIN_SUPERDATA_AREA_SERVED !== '' ? array_map('trim', explode(',', PLUGIN_SUPERDATA_AREA_SERVED)) : []),
+        'availableLanguage' => (PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE !== '' ? array_map('trim', explode(',', PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE)) : []),
     ];
 
     /*
@@ -871,22 +927,22 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
     if ($organization_type !== 'Organization' && $organization_type !== 'OnlineBusiness') {
 
         // Images
-        if (PLUGIN_SDATA_PROPERTY_IMAGE !== '') {
-            $photo = trim(PLUGIN_SDATA_PROPERTY_IMAGE);
-            $schema['image'] = str_contains($photo, ',')
+        if (PLUGIN_SUPERDATA_PROPERTY_IMAGE !== '') {
+            $photo = trim(PLUGIN_SUPERDATA_PROPERTY_IMAGE);
+            $schema['image'] = strpos($photo, ',') !== false
                 ? array_map('trim', explode(',', $photo))
                 : $photo;
         }
 
         // Price range
-        if (PLUGIN_SDATA_PRICE_RANGE !== '') {
-            $schema['priceRange'] = PLUGIN_SDATA_PRICE_RANGE;
+        if (PLUGIN_SUPERDATA_PRICE_RANGE !== '') {
+            $schema['priceRange'] = PLUGIN_SUPERDATA_PRICE_RANGE;
         }
 
         /*
          * Opening hours (LocalBusiness only)
          */
-        if (defined('PLUGIN_SDATA_HOURS') && PLUGIN_SDATA_HOURS !== '') {
+        if (defined('PLUGIN_SUPERDATA_HOURS') && PLUGIN_SUPERDATA_HOURS !== '') {
             $day_map = [
                 'Mon' => 'https://schema.org/Monday',
                 'Tue' => 'https://schema.org/Tuesday',
@@ -899,7 +955,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
             $hours_specs = [];
             // break into groups (e.g., Weekdays | Weekends)
-            $groups = explode('|', PLUGIN_SDATA_HOURS);
+            $groups = explode('|', PLUGIN_SUPERDATA_HOURS);
 
             foreach ($groups as $group) {
                 // Separate days from times (Mon,Tue;09:00-17:00)
@@ -948,7 +1004,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
     $schema = sdata_clean_schema($schema);
     ?>
-<script title="Structured Data: schemaOrganisation" type="application/ld+json">
+<script title="SuperData: schemaOrganisation" type="application/ld+json">
 <?= json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1004,7 +1060,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             ];
         }
 ?>
-<script title="Structured Data: schemaBreadcrumb" type="application/ld+json">
+<script title="SuperData: schemaBreadcrumb" type="application/ld+json">
 <?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1020,12 +1076,12 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             'contactType' => 'customer service',
         ];
 
-        if (!empty(PLUGIN_SDATA_AREA_SERVED)) {
-            $contactPoint['areaServed'] = PLUGIN_SDATA_AREA_SERVED;
+        if (!empty(PLUGIN_SUPERDATA_AREA_SERVED)) {
+            $contactPoint['areaServed'] = PLUGIN_SUPERDATA_AREA_SERVED;
         }
 
-        if (!empty(PLUGIN_SDATA_AVAILABLE_LANGUAGE)) {
-            $contactPoint['availableLanguage'] = PLUGIN_SDATA_AVAILABLE_LANGUAGE;
+        if (!empty(PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE)) {
+            $contactPoint['availableLanguage'] = PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE;
         }
 
         // Build mainEntity Organization
@@ -1048,7 +1104,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
 
         $contactSchema = sdata_clean_schema($contactSchema);
 ?>
-<script title="Structured Data: schemaContactPage" type="application/ld+json">
+<script title="SuperData: schemaContactPage" type="application/ld+json">
 <?= json_encode($contactSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1074,7 +1130,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
         // Remove any empty schema entries
         $itemListSchema = sdata_clean_schema($itemListSchema);
 ?>
-<script title="Structured Data: schemaItemList" type="application/ld+json">
+<script title="SuperData: schemaItemList" type="application/ld+json">
 <?= json_encode($itemListSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1085,11 +1141,11 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
     $webPageSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'WebPage',
-        'name' => sdata_truncate(META_TAG_TITLE, PLUGIN_SDATA_MAX_NAME),
+        'name' => sdata_truncate(META_TAG_TITLE, PLUGIN_SUPERDATA_MAX_NAME),
         'url' => htmlspecialchars_decode($canonicalLink),
         'isPartOf' => [
             '@type' => "WebSite",
-            'name' => PLUGIN_SDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SDATA_LEGAL_NAME ?: STORE_NAME,
+            'name' => PLUGIN_SUPERDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SUPERDATA_LEGAL_NAME ?: STORE_NAME,
             'url' => HTTP_SERVER
             ]
     ];
@@ -1099,7 +1155,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
         $webSiteSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',
-            'name' => PLUGIN_SDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SDATA_LEGAL_NAME ?: STORE_NAME,
+            'name' => PLUGIN_SUPERDATA_LOCAL_BUSINESS_NAME ?: PLUGIN_SUPERDATA_LEGAL_NAME ?: STORE_NAME,
             'url' => HTTP_SERVER,
             'potentialAction' => [
                 '@type' => 'SearchAction',
@@ -1108,7 +1164,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                 ]
             ]
 ?>
-<script title="Structured Data: schemaWebSite" type="application/ld+json">
+<script title="SuperData: schemaWebSite" type="application/ld+json">
 <?= json_encode($webSiteSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1127,10 +1183,10 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
         $productSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
-            'name' => sdata_truncate($product_name, PLUGIN_SDATA_MAX_NAME),
+            'name' => sdata_truncate($product_name, PLUGIN_SUPERDATA_MAX_NAME),
             'url' => htmlspecialchars_decode($canonicalLink),
             'image' => $image,
-            'description' => sdata_truncate($description, PLUGIN_SDATA_MAX_DESCRIPTION),
+            'description' => sdata_truncate($description, PLUGIN_SUPERDATA_MAX_DESCRIPTION),
             'sku' => $product_base_sku,
             'weight' => [
                 '@type' => 'QuantitativeValue',
@@ -1194,13 +1250,15 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                                                 : $weight),
                                 'unitCode' => ((SHIPPING_WEIGHT_UNITS === 'kgs') ? 'KGM' : 'LBR'),
                             ],
-                            'priceCurrency' => PLUGIN_SDATA_PRICE_CURRENCY,
+                            'priceCurrency' => PLUGIN_SUPERDATA_PRICE_CURRENCY,
                             'availability' => $product_attribute['stock'] > 0
                                 ? $itemAvailability['InStock']
                                 : $oosItemAvailability,
                             'priceValidUntil' => date('Y') . '-12-31',
                             'url' => htmlspecialchars_decode($canonicalLink),
                         ];
+
+                        $offer = array_merge($offer, $offerEnhancements);
 
                         // Optional: merchant return policy (previously injected as raw JSON)
                         if (!empty($hasMerchantReturnPolicy)) {
@@ -1237,13 +1295,15 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                         'url' => htmlspecialchars_decode($canonicalLink),
                         'priceCurrency' => DEFAULT_CURRENCY,
                         'priceValidUntil'=> date('Y') . '-12-31',
-                        'itemCondition' => 'https://schema.org/' . $itemCondition[PLUGIN_SDATA_FOG_PRODUCT_CONDITION],
+                        'itemCondition' => 'https://schema.org/' . $itemCondition[PLUGIN_SUPERDATA_FOG_PRODUCT_CONDITION],
                         'availability' => ($product_base_stock > 0 ? $itemAvailability['InStock'] : $oosItemAvailability),
                         'seller' => [
                             '@type' => 'Organization',
                             'name' => STORE_NAME,
                         ],
                     ];
+
+                    $offer = array_merge($offer, $offerEnhancements);
 
                     // Optional: merchant return policy
                     if (!empty($hasMerchantReturnPolicy)) {
@@ -1265,8 +1325,8 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                     }
 
                     $leadTime = ($product_base_stock > 0
-                        ? (int)PLUGIN_SDATA_DELIVERYLEADTIME
-                        : (int)PLUGIN_SDATA_DELIVERYLEADTIME_OOS);
+                        ? (int)PLUGIN_SUPERDATA_DELIVERYLEADTIME
+                        : (int)PLUGIN_SUPERDATA_DELIVERYLEADTIME_OOS);
                     if (!empty($leadTime)) {
                         $offer['deliveryLeadTime'] = [
                             '@type' => 'QuantitativeValue',
@@ -1275,8 +1335,8 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                         ];
                     }
 
-                    if (PLUGIN_SDATA_ELIGIBLE_REGION !== '') {
-                        $offer['eligibleRegion'] = PLUGIN_SDATA_ELIGIBLE_REGION;
+                    if (PLUGIN_SUPERDATA_ELIGIBLE_REGION !== '') {
+                        $offer['eligibleRegion'] = PLUGIN_SUPERDATA_ELIGIBLE_REGION;
                     }
 
                     $offer['acceptedPaymentMethod'] =  $PaymentMethods;
@@ -1291,15 +1351,17 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                 '@type' => 'Offer',
                 'price' => $product_base_displayed_price,
                 'url' => htmlspecialchars_decode($canonicalLink),
-                'priceCurrency' => PLUGIN_SDATA_PRICE_CURRENCY,
+                'priceCurrency' => PLUGIN_SUPERDATA_PRICE_CURRENCY,
                 'priceValidUntil'=> date('Y') . '-12-31',
-                'itemCondition' => 'https://schema.org/' . $itemCondition[PLUGIN_SDATA_FOG_PRODUCT_CONDITION],
+                'itemCondition' => 'https://schema.org/' . $itemCondition[PLUGIN_SUPERDATA_FOG_PRODUCT_CONDITION],
                 'availability' => ($product_base_stock > 0 ? $itemAvailability['InStock'] : $oosItemAvailability),
                 'seller' => [
                         '@type' => 'Organization',
                         'name' => STORE_NAME,
                     ],
             ];
+
+            $offer = array_merge($offer, $offerEnhancements);
 
             // Optional: merchant return policy
             if (!empty($hasMerchantReturnPolicy)) {
@@ -1311,8 +1373,8 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
             }
 
             $leadTime = ($product_base_stock > 0
-                ? (int)PLUGIN_SDATA_DELIVERYLEADTIME
-                : (int)PLUGIN_SDATA_DELIVERYLEADTIME_OOS);
+                ? (int)PLUGIN_SUPERDATA_DELIVERYLEADTIME
+                : (int)PLUGIN_SUPERDATA_DELIVERYLEADTIME_OOS);
             if (!empty($leadTime)) {
                 $offer['deliveryLeadTime'] = [
                     '@type' => 'QuantitativeValue',
@@ -1321,8 +1383,8 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
                 ];
             }
 
-            if (PLUGIN_SDATA_ELIGIBLE_REGION !== '') {
-                $offer['eligibleRegion'] = PLUGIN_SDATA_ELIGIBLE_REGION;
+            if (PLUGIN_SUPERDATA_ELIGIBLE_REGION !== '') {
+                $offer['eligibleRegion'] = PLUGIN_SUPERDATA_ELIGIBLE_REGION;
             }
 
             $offer['acceptedPaymentMethod']  = $PaymentMethods;
@@ -1366,7 +1428,7 @@ if (PLUGIN_SDATA_SCHEMA_ENABLE === 'true') {
         // Remove empty schema entries
         $productSchema = sdata_clean_schema($productSchema);
 ?>
-<script title="Structured Data: schemaProduct" type="application/ld+json">
+<script title="SuperData: schemaProduct" type="application/ld+json">
 <?= json_encode($productSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
@@ -1377,28 +1439,28 @@ $webPageSchema['about'] = $productSchema;
 
 // output web page schema
 ?>
-<script title="Structured Data: schemaWebPage" type="application/ld+json">
+<script title="SuperData: schemaWebPage" type="application/ld+json">
 <?= json_encode($webPageSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL; ?>
 </script>
 <?php
 }
 // eof Schema enabled
 
-if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
+if (PLUGIN_SUPERDATA_FOG_ENABLE === 'true') {
 ?>
     <!-- Facebook structured data general-->
 <?php
 // opening php tags from this point forward must be at the beginning of the line or the meta tag formatting will look wrong.
-    if (PLUGIN_SDATA_FOG_APPID !== '') {
+    if (PLUGIN_SUPERDATA_FOG_APPID !== '') {
 ?>
-    <meta property="fb:app_id" content="<?= (int)PLUGIN_SDATA_FOG_APPID ?>">
+    <meta property="fb:app_id" content="<?= (int)PLUGIN_SUPERDATA_FOG_APPID ?>">
 <?php
     }
 ?>
 <?php
-    if (PLUGIN_SDATA_FOG_ADMINID !== '') {
+    if (PLUGIN_SUPERDATA_FOG_ADMINID !== '') {
 ?>
-    <meta property="fb:admins" content="<?= (int)PLUGIN_SDATA_FOG_ADMINID ?>">
+    <meta property="fb:admins" content="<?= (int)PLUGIN_SUPERDATA_FOG_ADMINID ?>">
 <?php
     }
 ?>
@@ -1450,46 +1512,46 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
 <?php
     if ($facebook_type !== 'product') {
 ?>
-    <meta property="og:type" content="<?= htmlentities(PLUGIN_SDATA_FOG_TYPE_SITE, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="og:type" content="<?= htmlentities(PLUGIN_SUPERDATA_FOG_TYPE_SITE, ENT_QUOTES, CHARSET, false) ?>">
 <?php
-        if (PLUGIN_SDATA_STREET_ADDRESS !== '') {
+        if (PLUGIN_SUPERDATA_STREET_ADDRESS !== '') {
 ?>
-    <meta property="business:contact_data:street_address" content="<?= htmlentities(PLUGIN_SDATA_STREET_ADDRESS, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:street_address" content="<?= htmlentities(PLUGIN_SUPERDATA_STREET_ADDRESS, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_LOCALITY !== '') {
+        if (PLUGIN_SUPERDATA_LOCALITY !== '') {
 ?>
-    <meta property="business:contact_data:locality" content="<?= htmlentities(PLUGIN_SDATA_LOCALITY, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:locality" content="<?= htmlentities(PLUGIN_SUPERDATA_LOCALITY, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_REGION !== '') {
+        if (PLUGIN_SUPERDATA_REGION !== '') {
  ?>
-    <meta property="business:contact_data:region" content="<?= htmlentities(PLUGIN_SDATA_REGION, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:region" content="<?= htmlentities(PLUGIN_SUPERDATA_REGION, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_POSTALCODE !== '') {
+        if (PLUGIN_SUPERDATA_POSTALCODE !== '') {
 ?>
-    <meta property="business:contact_data:postal_code" content="<?= htmlentities(PLUGIN_SDATA_POSTALCODE, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:postal_code" content="<?= htmlentities(PLUGIN_SUPERDATA_POSTALCODE, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_COUNTRYNAME !== '') {
+        if (PLUGIN_SUPERDATA_COUNTRYNAME !== '') {
 ?>
-    <meta property="business:contact_data:country_name" content="<?= htmlentities(PLUGIN_SDATA_COUNTRYNAME, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:country_name" content="<?= htmlentities(PLUGIN_SUPERDATA_COUNTRYNAME, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_EMAIL !== '') {
+        if (PLUGIN_SUPERDATA_EMAIL !== '') {
 ?>
-    <meta property="business:contact_data:email" content="<?= htmlentities(PLUGIN_SDATA_EMAIL, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:email" content="<?= htmlentities(PLUGIN_SUPERDATA_EMAIL, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_TELEPHONE !== '') {
+        if (PLUGIN_SUPERDATA_TELEPHONE !== '') {
 ?>
-    <meta property="business:contact_data:phone_number" content="<?= htmlentities(PLUGIN_SDATA_TELEPHONE, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:phone_number" content="<?= htmlentities(PLUGIN_SUPERDATA_TELEPHONE, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
-        if (PLUGIN_SDATA_FAX !== '') {
+        if (PLUGIN_SUPERDATA_FAX !== '') {
 ?>
-    <meta property="business:contact_data:fax_number" content="<?= htmlentities(PLUGIN_SDATA_FAX, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="business:contact_data:fax_number" content="<?= htmlentities(PLUGIN_SUPERDATA_FAX, ENT_QUOTES, CHARSET, false) ?>">
 <?php
         }
 ?>
@@ -1499,8 +1561,8 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
     } else {
 ?>
     <!-- Facebook structured data for product-->
-    <meta property="og:type" content="<?= htmlentities(trim(PLUGIN_SDATA_FOG_TYPE_PRODUCT), ENT_QUOTES, CHARSET, false) ?>">
-    <meta property="product:availability" content="<?= (($product_base_stock > 0) ? 'instock' : $facebookAvailability[PLUGIN_SDATA_OOS_DEFAULT]) ?>">
+    <meta property="og:type" content="<?= htmlentities(trim(PLUGIN_SUPERDATA_FOG_TYPE_PRODUCT), ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="product:availability" content="<?= (($product_base_stock > 0) ? 'instock' : $facebookAvailability[PLUGIN_SUPERDATA_OOS_DEFAULT]) ?>">
     <meta property="product:brand" content="<?= htmlentities(
                     (isset($manufacturer_name) && trim($manufacturer_name) !== '')
                         ? $manufacturer_name
@@ -1510,7 +1572,7 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
                     false
                 ) ?>">
     <meta property="product:category" content="<?= htmlentities($category_name) ?>">
-    <meta property="product:condition" content="<?= PLUGIN_SDATA_FOG_PRODUCT_CONDITION ?>">
+    <meta property="product:condition" content="<?= PLUGIN_SUPERDATA_FOG_PRODUCT_CONDITION ?>">
 <?php
         if ($product_base_mpn !== '') {
 ?>
@@ -1519,9 +1581,9 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
         }
 ?>
     <meta property="product:price:amount" content="<?= $product_base_displayed_price ?>">
-    <meta property="product:price:currency" content="<?= htmlentities(PLUGIN_SDATA_PRICE_CURRENCY, ENT_QUOTES, CHARSET, false) ?>">
+    <meta property="product:price:currency" content="<?= htmlentities(PLUGIN_SUPERDATA_PRICE_CURRENCY, ENT_QUOTES, CHARSET, false) ?>">
     <meta property="product:product_link" content="<?= $canonicalLink ?>">
-    <meta property="product:retailer" content="<?= !empty(PLUGIN_SDATA_FOG_APPID) ? htmlentities(PLUGIN_SDATA_FOG_APPID, ENT_QUOTES, CHARSET, false) : HTTP_SERVER . DIR_WS_CATALOG ?>">
+    <meta property="product:retailer" content="<?= !empty(PLUGIN_SUPERDATA_FOG_APPID) ? htmlentities(PLUGIN_SUPERDATA_FOG_APPID, ENT_QUOTES, CHARSET, false) : HTTP_SERVER . DIR_WS_CATALOG ?>">
     <meta property="product:retailer_category" content="<?= htmlentities($category_name) ?>">
     <meta property="product:retailer_part_no" content="<?= htmlentities($product_base_sku, ENT_QUOTES, CHARSET, false) ?>">
     <!-- eof Facebook structured data -->
@@ -1530,11 +1592,11 @@ if (PLUGIN_SDATA_FOG_ENABLE === 'true') {
 } //end facebook enabled
 ?>
 <?php
-if (PLUGIN_SDATA_TWITTER_CARD_ENABLE === 'true') {
+if (PLUGIN_SUPERDATA_TWITTER_CARD_ENABLE === 'true') {
 ?>
     <!-- Twitter Card markup -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="<?= htmlentities(PLUGIN_SDATA_TWITTER_USERNAME, ENT_QUOTES, CHARSET, false) ?>">
+    <meta name="twitter:site" content="<?= htmlentities(PLUGIN_SUPERDATA_TWITTER_USERNAME, ENT_QUOTES, CHARSET, false) ?>">
     <meta name="twitter:title" content="<?= htmlentities($title, ENT_QUOTES, CHARSET, false) ?>">
     <meta name="twitter:description" content="<?= htmlentities($description) ?>">
 <?php
@@ -1549,10 +1611,10 @@ $image = ($image_default ? $image_default_twitter : $image);
 } //end of Twitter enabled
 ?>
 <?php //google+ markup
-if (PLUGIN_SDATA_GOOGLE_PUBLISHER !== '') {
+if (PLUGIN_SUPERDATA_GOOGLE_PUBLISHER !== '') {
 ?>
     <!-- Google+-->
-    <link href="<?= PLUGIN_SDATA_GOOGLE_PUBLISHER ?>" rel="publisher">
+    <link href="<?= PLUGIN_SUPERDATA_GOOGLE_PUBLISHER ?>" rel="publisher">
     <!-- eof Google+-->
 <?php
 } //eof Google+
