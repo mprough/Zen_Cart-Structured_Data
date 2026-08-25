@@ -82,7 +82,7 @@ $returnPolicyCategory = [
 $returnMethod = [
     'Kiosk' => 'https://schema.org/ReturnAtKiosk',
     'Mail' => 'https://schema.org/ReturnByMail',
-    'Store ' => 'https://schema.org/ReturnInStore'
+    'Store' => 'https://schema.org/ReturnInStore'
 ];
 // eof Schema arrays
 
@@ -798,13 +798,24 @@ if (defined('PLUGIN_SUPERDATA_SHIPPING_DETAILS_ENABLE')
 //common code block used in attribute-handling option and simple product
 $hasMerchantReturnPolicy = [];
 
-if (!empty(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY)) {
+$applicableReturnCountry = trim(PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY);
+if ($applicableReturnCountry !== '' && isset($returnPolicyCategory[PLUGIN_SUPERDATA_RETURNS_POLICY])) {
     $policyData = [
         '@type' => 'MerchantReturnPolicy',
-        'applicableCountry' => PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY,
+        'applicableCountry' => strpos($applicableReturnCountry, ',') !== false
+            ? array_map('trim', explode(',', $applicableReturnCountry))
+            : $applicableReturnCountry,
         'returnPolicyCategory' => $returnPolicyCategory[PLUGIN_SUPERDATA_RETURNS_POLICY],
-        'returnMethod' => $returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD]
     ];
+
+    if (trim(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY) !== '') {
+        $policyData['returnPolicyCountry'] = strtoupper(trim(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY));
+    }
+
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted'
+        && isset($returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD])) {
+        $policyData['returnMethod'] = $returnMethod[PLUGIN_SUPERDATA_RETURNS_METHOD];
+    }
 
     if (PLUGIN_SUPERDATA_RETURNS_POLICY === 'Finite') {
         $policyData['merchantReturnDays'] = (int)PLUGIN_SUPERDATA_RETURNS_DAYS;
@@ -815,15 +826,15 @@ if (!empty(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY)) {
     $rCurrency = defined('PLUGIN_SUPERDATA_PRICE_CURRENCY') ? PLUGIN_SUPERDATA_PRICE_CURRENCY : 'GBP';
 
     // Set the Schema URL for the fee type
-    if ($rType === 'RestockingFees') {
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted' && $rType === 'RestockingFees') {
         // although valid enumeration, Google doesn't accept it so we must use ReturnFeesCustomerResponsibility
         $policyData['returnFees'] = 'https://schema.org/ReturnFeesCustomerResponsibility';
-    } else {
+    } elseif (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted') {
         $policyData['returnFees'] = 'https://schema.org/' . $rType;
     }
 
     // Handle "RestockingFees" (Percentage or Fixed)
-    if ($rType === 'RestockingFees') {
+    if (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted' && $rType === 'RestockingFees') {
         // Check for percentage
         if (strpos($rFeeVal, '%') !== false) {
             // It is a percentage (e.g. "20%")
@@ -850,7 +861,8 @@ if (!empty(PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY)) {
         }
 
         // Handle "ReturnShippingFees" (Fixed shipping cost)
-    } elseif ($rType === 'ReturnShippingFees' && (float)$rFeeVal > 0) {
+    } elseif (PLUGIN_SUPERDATA_RETURNS_POLICY !== 'NotPermitted'
+        && $rType === 'ReturnShippingFees' && (float)$rFeeVal > 0) {
         $policyData['returnShippingFeesAmount'] = [
             '@type' => 'MonetaryAmount',
             'currency' => $rCurrency,
@@ -932,18 +944,27 @@ if (PLUGIN_SUPERDATA_SCHEMA_ENABLE === 'true') {
         'availableLanguage' => (PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE !== '' ? array_map('trim', explode(',', PLUGIN_SUPERDATA_AVAILABLE_LANGUAGE)) : []),
     ];
 
+    if (!empty($hasMerchantReturnPolicy)) {
+        $schema = array_merge($schema, $hasMerchantReturnPolicy);
+    }
+
+    // Google treats logo and image as separate properties. Use configured
+    // business images when available, otherwise use the logo as a safe image
+    // fallback for Organization, OnlineBusiness, OnlineStore and LocalBusiness.
+    $businessImage = trim(PLUGIN_SUPERDATA_PROPERTY_IMAGE);
+    if ($businessImage === '') {
+        $businessImage = trim(PLUGIN_SUPERDATA_LOGO);
+    }
+    if ($businessImage !== '') {
+        $schema['image'] = strpos($businessImage, ',') !== false
+            ? array_map('trim', explode(',', $businessImage))
+            : $businessImage;
+    }
+
     /*
      * LocalBusiness extras (NOT for OnlineBusiness or Organization)
      */
     if ($organization_type !== 'Organization' && $organization_type !== 'OnlineBusiness') {
-
-        // Images
-        if (PLUGIN_SUPERDATA_PROPERTY_IMAGE !== '') {
-            $photo = trim(PLUGIN_SUPERDATA_PROPERTY_IMAGE);
-            $schema['image'] = strpos($photo, ',') !== false
-                ? array_map('trim', explode(',', $photo))
-                : $photo;
-        }
 
         // Price range
         if (PLUGIN_SUPERDATA_PRICE_RANGE !== '') {

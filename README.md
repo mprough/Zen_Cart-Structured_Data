@@ -13,7 +13,7 @@ This is the successor to Structured Data for Zen Cart. Version 3 is renamed, reo
 
 Always test on a development store and back up the files and database before installation.
 
-## Google Offer fields fixed in SuperData 3.0.1
+## Google fields fixed in SuperData 3.0.2
 
 Every generated Offer path now supports:
 
@@ -23,6 +23,10 @@ Every generated Offer path now supports:
 - `shippingRate` with value and currency
 - `deliveryTime.handlingTime`
 - `deliveryTime.transitTime`
+
+Organization, OnlineBusiness, OnlineStore, and LocalBusiness markup also includes `image`. SuperData uses the configured Business Image when present and falls back to the configured Logo.
+
+`hasMerchantReturnPolicy` is added to the Organization and to every Offer when Returns - Applicable Country is configured. The optional Return Destination Country is included as `returnPolicyCountry`, but leaving it blank no longer suppresses the entire policy.
 
 `validFrom` uses a future product availability date when one is set. Otherwise, it uses the product creation date. If neither contains a valid date, SuperData safely uses the current date.
 
@@ -38,7 +42,7 @@ The safe default is `MerchantCenter`. The initial destination is `US`, handling 
 
 1. Copy the contents of `files/zc_plugins` to the store's `zc_plugins` directory.
 2. In Admin, open Modules > Plugin Manager.
-3. Install SuperData 3.0.1.
+3. Install SuperData 3.0.2.
 4. Open Configuration > SuperData and review every store-specific setting.
 5. Validate at least one simple product, one product with attributes, and one out-of-stock product.
 

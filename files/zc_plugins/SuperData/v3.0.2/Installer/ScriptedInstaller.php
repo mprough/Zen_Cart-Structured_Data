@@ -23,7 +23,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
     public string $pluginKey = 'SuperData';
 
-    public string $version = '3.0.1';
+    public string $version = '3.0.2';
 
 
 
@@ -66,7 +66,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
                 ('Name (Schema)', 'PLUGIN_SUPERDATA_LOCAL_BUSINESS_NAME', '', 'If you chose LocalBusiness, enter the name (this can be different than your Legal Name).', $this->cgi, 20, null),
                 ('Short Description (Schema)', 'PLUGIN_SUPERDATA_DESCRIPTION', '', 'Enter a short description of your business.', $this->cgi, 21, null),
-                ('Property Image (Schema)', 'PLUGIN_SUPERDATA_PROPERTY_IMAGE', '', 'If you selected LocalBusiness as your Business Type, you must include a photo of your storefront or building entrance to help customers find you. Best practice is to include 3 photos in different dimensions (1x1, 4x3, 16x9). Example: https://example.com/photos/1x1/photo.jpg, https://example.com/photos/4x3/photo.jpg, https://example.com/photos/16x9/photo.jpg', $this->cgi, 25, null),
+                ('Business Image (Schema, optional)', 'PLUGIN_SUPERDATA_PROPERTY_IMAGE', '', 'Image for Organization, OnlineBusiness, OnlineStore, or LocalBusiness markup. Enter one complete image URL or multiple URLs separated by commas. If blank, SuperData uses the configured Logo so the Schema image field is not missing.', $this->cgi, 25, null),
 
                 ('Logo (Schema)', 'PLUGIN_SUPERDATA_LOGO', '', 'Enter the complete url to your logo image.', $this->cgi, 30, null),
 
@@ -131,10 +131,10 @@ class ScriptedInstaller extends ScriptedInstallBase
                 ('Returns - Policy', 'PLUGIN_SUPERDATA_RETURNS_POLICY', 'Finite', 'The type of return policy.', $this->cgi, 250, 'zen_cfg_select_option(array(\'Finite\', \'NotPermitted\', \'Unlimited\'),'),
                 ('Returns - Days', 'PLUGIN_SUPERDATA_RETURNS_DAYS', '14', 'In the case of the Finite return policy, the period (days limit) during which the product can be returned.', $this->cgi, 255, null),
                 ('Returns - Methods', 'PLUGIN_SUPERDATA_RETURNS_METHOD', 'Mail', 'In the case of the Finite/Unlimited return policies, the method of returning the product.', $this->cgi, 260, 'zen_cfg_select_option(array(\'Kiosk\', \'Mail\', \'Store\'),'),
-                ('Returns - Type', 'PLUGIN_SUPERDATA_RETURNS_TYPE', 'FreeReturn', 'The type of fee for returns.', $this->cgi, 265, 'zen_cfg_select_option(array(\'FreeReturn\', \'OriginalShippingFees\', \'RestockingFees\', \'ReturnFeesCustomerResponsibility\', \' ReturnShippingFees\'),'),
+                ('Returns - Type', 'PLUGIN_SUPERDATA_RETURNS_TYPE', 'FreeReturn', 'The type of fee for returns. Ignored when returns are not permitted.', $this->cgi, 265, 'zen_cfg_select_option(array(\'FreeReturn\', \'OriginalShippingFees\', \'RestockingFees\', \'ReturnFeesCustomerResponsibility\', \'ReturnShippingFees\'),'),
                 ('Returns - Fee', 'PLUGIN_SUPERDATA_RETURNS_FEE', '0', 'The charge to the customer for returning the product. You can enter a fixed amount or percentage. If you add percentage, the value will be calculated as percentage of the item price.', $this->cgi, 270, null),
-                ('Returns - Applicable Country', 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY', '', 'The country in which the returns policy is applicable (2-char ISO e.g. ES) For worldwide, enter **.', $this->cgi, 275, null),
-                ('Returns - Returns Country', 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY', '', 'The country to which the product must be returned (2-char ISO e.g. ES).', $this->cgi, 280, null),
+                ('Returns - Applicable Country', 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY', '', '<strong>Required to publish hasMerchantReturnPolicy.</strong> Enter the two-letter ISO country code where this policy applies, for example US. Separate multiple countries with commas.', $this->cgi, 275, null),
+                ('Returns - Return Destination Country', 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY', '', 'Optional two-letter ISO country code where returned products must be sent. This no longer controls whether the return policy is published.', $this->cgi, 280, null),
 
                 ('Custom Product Field - Google Product Category', 'PLUGIN_SUPERDATA_GPC_FIELD', 'products_google_product_category', 'The name of the custom field used in the <strong>products</strong> table for the Google Product Category.', $this->cgi, 285, null),
                 ('Custom Product Field - GTIN', 'PLUGIN_SUPERDATA_GTIN_FIELD', 'products_gtin', 'The name of the custom field used in the <strong>products</strong> table for the product-specific code GTIN (EAN, ISBN etc.).', $this->cgi, 290, null),
@@ -210,7 +210,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 
                 ('Hours Available (Schema-Customer Service, optional)', 'PLUGIN_SUPERDATA_HOURS', '', 'Customer service working hours (<a href=\"https://schema.org/hoursAvailable\" target=\"_blank\">further details here</a>).<br>If omitted, it will be skipped.)<br>Supports simple and complex scenarios.<br><strong>REQUIREMENTS:</strong> days are listed first, using 3-letter English abbreviation and separated with a comma. Semicolon is used as delimiter between days and times. Times are entered in 24-hour format with a minus indicating range. Split shifts are separated with a comma. Different rules are separated with a pipe.<br>Examples:<br><strong>Simple:</strong> Mon,Tue,Wed,Thu,Fri;09:00-17:00<br><strong>Weekend different:</strong> Mon,Tue,Wed,Thu,Fri;09:00-17:00|Sat;10:00-14:00<br><strong>Split Shift (Lunch break):</strong> Mon,Tue,Wed,Thu,Fri;09:00-12:00,13:00-17:00<br><strong>Complex:</strong> Mon,Wed,Fri;09:00-17:00|Tue,Thu;09:00-12:00,13:00-17:00|Sat;10:00-12:00', $this->cgi, 90, null),
 
-                ('Returns - Type', 'PLUGIN_SUPERDATA_RETURNS_TYPE', 'FreeReturn', 'The type of fee for returns.', $this->cgi, 265, 'zen_cfg_select_option(array(\'FreeReturn\', \'OriginalShippingFees\', \'RestockingFees\', \'ReturnFeesCustomerResponsibility\', \' ReturnShippingFees\'),')
+                ('Returns - Type', 'PLUGIN_SUPERDATA_RETURNS_TYPE', 'FreeReturn', 'The type of fee for returns.', $this->cgi, 265, 'zen_cfg_select_option(array(\'FreeReturn\', \'OriginalShippingFees\', \'RestockingFees\', \'ReturnFeesCustomerResponsibility\', \'ReturnShippingFees\'),')
                 ");
 
                 // Update Sort order
@@ -266,6 +266,9 @@ class ScriptedInstaller extends ScriptedInstallBase
                 $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = 'The country in which the returns policy is applicable (2-char ISO e.g. ES) For worldwide, enter **.', sort_order = 275 WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY'");
                 break;
         }
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Business Image (Schema, optional)', configuration_description = 'Image for Organization, OnlineBusiness, OnlineStore, or LocalBusiness markup. Enter one complete image URL or multiple URLs separated by commas. If blank, SuperData uses the configured Logo so the Schema image field is not missing.' WHERE configuration_key = 'PLUGIN_SUPERDATA_PROPERTY_IMAGE'");
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_description = '<strong>Required to publish hasMerchantReturnPolicy.</strong> Enter the two-letter ISO country code where this policy applies, for example US. Separate multiple countries with commas.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_APPLICABLE_COUNTRY'");
+        $this->executeInstallerSql("UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Returns - Return Destination Country', configuration_description = 'Optional two-letter ISO country code where returned products must be sent. This no longer controls whether the return policy is published.' WHERE configuration_key = 'PLUGIN_SUPERDATA_RETURNS_POLICY_COUNTRY'");
         return true;
     }
 
