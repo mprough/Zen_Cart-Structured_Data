@@ -62,6 +62,8 @@ The legacy file avoids PHP 8-only functions and syntax. It uses traditional temp
 
 To uninstall the legacy edition, run `files/legacy/sql/uninstall.sql`, then remove the two copied PHP files.
 
+Existing legacy SuperData installations should copy the updated PHP files and run `files/legacy/sql/upgrade_to_3.0.2.sql`. The upgrade adds missing settings and refreshes their instructions without resetting existing configuration values.
+
 ## Required configuration review
 
 At minimum, verify:
