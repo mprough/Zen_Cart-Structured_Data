@@ -17,7 +17,10 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-      - name: Lint PHP files
-        run: find files -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Lint legacy PHP files
+        run: find files/legacy -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Lint Plugin Manager PHP files
+        if: matrix.php != '7.3'
+        run: find files/zc_plugins -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Check required Offer properties
         run: bash tests/check-offer-fields.sh

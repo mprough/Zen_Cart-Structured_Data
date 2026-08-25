@@ -8,7 +8,8 @@ This is the successor to Structured Data for Zen Cart. Version 3 is renamed, reo
 
 - Zen Cart 2.0.x, 2.1.x, and 2.2.x: encapsulated Plugin Manager package
 - Zen Cart 1.5.6 and 1.5.7: traditional template package
-- PHP 7.3 through PHP 8.5
+- Legacy package: PHP 7.3 through PHP 8.5
+- Plugin Manager package: PHP 7.4 through PHP 8.5
 
 Always test on a development store and back up the files and database before installation.
 
@@ -40,12 +41,16 @@ The installer copies matching values from an existing Structured Data installati
 ## Installation: Zen Cart 1.5.6 and 1.5.7
 
 1. Copy `files/legacy/includes/templates/YOUR_TEMPLATE/jscript/jscript_super_data.php` to the matching folder for the active template, replacing `YOUR_TEMPLATE` with the real template directory.
-2. If the former Structured Data plugin is installed, its existing `PLUGIN_SDATA_*` settings are reused automatically.
-3. On a fresh legacy installation, edit the defaults near the beginning of `jscript_super_data.php` for the store. Database-defined constants override those defaults.
-4. Remove or rename an older `jscript_structured_data.php` file so both plugins do not emit duplicate markup.
-5. Validate the output before deploying it to the live store.
+2. Copy `files/legacy/YOUR_ADMIN/includes/extra_datafiles/super_data.php` to the matching admin folder, replacing `YOUR_ADMIN` with the store's real admin directory.
+3. In Admin, open Tools > Install SQL Patches and run `files/legacy/sql/install.sql`.
+4. Open Configuration > SuperData and review every setting, especially the shipping rate and destination.
+5. If the former Structured Data plugin is installed, matching `PLUGIN_SDATA_*` values are migrated automatically and retained for rollback.
+6. Remove or rename an older `jscript_structured_data.php` file so both plugins do not emit duplicate markup.
+7. Validate the output before deploying it to the live store.
 
 The legacy file avoids PHP 8-only functions and syntax. It uses traditional template autoloading because Zen Cart 1.5.x does not provide the modern Plugin Manager package lifecycle.
+
+To uninstall the legacy edition, run `files/legacy/sql/uninstall.sql`, then remove the two copied PHP files.
 
 ## Required configuration review
 
